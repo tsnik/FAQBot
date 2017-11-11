@@ -18,14 +18,14 @@ namespace FaqBotServer
         private String apiKey;
         private String supportEmail;
         private DBCredentials dbCreds;
-        private Settings settings;
+        private static Settings settings;
         
         private Settings()
         {
 
         }
 
-        public Settings GetSettings()
+        public static Settings GetSettings()
         {
             if(settings == null)
             {

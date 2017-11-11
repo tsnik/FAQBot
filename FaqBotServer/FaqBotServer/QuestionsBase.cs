@@ -19,20 +19,22 @@ namespace FaqBotServer
         String Text;
         int id;
     }
+
     class QuestionsBase
     {
-        QuestionsBase questionBase;
+        static QuestionsBase questionBase;
          
-        private QuestionsBase ()
+        private QuestionsBase (DBCredentials creds)
         {
 
         }
 
-        public QuestionsBase getQuestionBase()
+        public static QuestionsBase getQuestionBase()
         {
             if(questionBase == null)
             {
-                questionBase = new QuestionsBase();
+                questionBase = new QuestionsBase(Settings.GetSettings().DBCreds);
+                questionBase.LoadDB();
             }
             return questionBase;
         }
