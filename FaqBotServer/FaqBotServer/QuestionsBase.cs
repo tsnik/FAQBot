@@ -21,6 +21,22 @@ namespace FaqBotServer
     }
     class QuestionsBase
     {
+        QuestionsBase questionBase;
+         
+        private QuestionsBase ()
+        {
+
+        }
+
+        public QuestionsBase getQuestionBase()
+        {
+            if(questionBase == null)
+            {
+                questionBase = new QuestionsBase();
+            }
+            return questionBase;
+        }
+
         public void LoadDB()
         {
             return;
