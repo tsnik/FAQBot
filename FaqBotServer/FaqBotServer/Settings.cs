@@ -26,15 +26,16 @@ namespace FaqBotServer
             return settings;
         }
 
-        public String ApiKey
+        public string ApiKey
         {
             get
             {
-                return apiKey;
+                //return apiKey;
+                return "483580455:AAF_nwfbVQluNkP1d8wHpVMtwW_x8gvMELM";
             }
         }
 
-        public String SupportEmail
+        public string SupportEmail
         {
             get
             {
@@ -51,8 +52,8 @@ namespace FaqBotServer
         }
 
         #region Private
-        private String apiKey;
-        private String supportEmail;
+        private string apiKey;
+        private string supportEmail;
         private DBCredentials dbCreds;
         private static Settings settings;
 
