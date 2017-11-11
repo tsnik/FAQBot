@@ -3,25 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace FaqBotServer
 {
     class Client
     {
-        public Client(int uid)
+        public Client(long cid, TelegramBotClient bot)
         {
-            this.uid = uid;
+            this.cid = cid;
             this.qid = -1;
+            this.bot = bot;
         }
 
-        public void OnMessage(String Text)
+        public async 
+        Task
+OnMessage(Message message)
         {
-            return;
+
+            if (message == null || message.Type != MessageType.TextMessage) return;
+
+            await bot.SendTextMessageAsync(message.Chat.Id, "Choose" + qid);
+            qid++;
         }
 
         #region Private
-        private int uid;
+        private long cid;
         private int qid;
+        private TelegramBotClient bot;
         #endregion
     }
 }
