@@ -18,6 +18,22 @@ namespace FaqBotServer
         private String apiKey;
         private String supportEmail;
         private DBCredentials dbCreds;
+        private Settings settings;
+        
+        private Settings()
+        {
+
+        }
+
+        public Settings GetSettings()
+        {
+            if(settings == null)
+            {
+                settings = new Settings();
+                settings.LoadSettings();
+            }
+            return settings;
+        }
 
         public String ApiKey
         {
