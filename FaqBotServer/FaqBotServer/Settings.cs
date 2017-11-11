@@ -47,7 +47,8 @@ namespace FaqBotServer
         {
             get
             {
-                return dbCreds;
+                //return dbCreds;
+                return new DBCredentials();
             }
         }
 
