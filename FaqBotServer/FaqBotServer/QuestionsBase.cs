@@ -22,13 +22,6 @@ namespace FaqBotServer
 
     class QuestionsBase
     {
-        static QuestionsBase questionBase;
-         
-        private QuestionsBase (DBCredentials creds)
-        {
-
-        }
-
         public static QuestionsBase getQuestionBase()
         {
             if(questionBase == null)
@@ -37,11 +30,6 @@ namespace FaqBotServer
                 questionBase.LoadDB();
             }
             return questionBase;
-        }
-
-        public void LoadDB()
-        {
-            return;
         }
 
         /// <summary>
@@ -55,5 +43,20 @@ namespace FaqBotServer
         {
             return null;
         }
+
+        #region Private
+        private static QuestionsBase questionBase;
+
+        private QuestionsBase(DBCredentials creds)
+        {
+
+        }
+
+        private void LoadDB()
+        {
+            return;
+        }
+        #endregion
+
     }
 }

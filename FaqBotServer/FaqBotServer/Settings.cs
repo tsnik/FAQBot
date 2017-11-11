@@ -13,18 +13,9 @@ namespace FaqBotServer
         String User;
         String Password;
     }
+
     class Settings
     {
-        private String apiKey;
-        private String supportEmail;
-        private DBCredentials dbCreds;
-        private static Settings settings;
-        
-        private Settings()
-        {
-
-        }
-
         public static Settings GetSettings()
         {
             if(settings == null)
@@ -59,10 +50,21 @@ namespace FaqBotServer
             }
         }
 
+        #region Private
+        private String apiKey;
+        private String supportEmail;
+        private DBCredentials dbCreds;
+        private static Settings settings;
+
+        private Settings()
+        {
+
+        }
+
         public void LoadSettings()
         {
             return;
         }
-
+        #endregion
     }
 }

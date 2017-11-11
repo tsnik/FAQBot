@@ -8,12 +8,20 @@ namespace FaqBotServer
 {
     class Client
     {
-        private int uid;
-        private int qid;
+        public Client(int uid)
+        {
+            this.uid = uid;
+            this.qid = -1;
+        }
 
         public void OnMessage(String Text)
         {
             return;
         }
+
+        #region Private
+        private int uid;
+        private int qid;
+        #endregion
     }
 }
