@@ -35,7 +35,7 @@ namespace FaqBotServer
             switch (id)
             {
                 case -1:
-                    break;
+                    return;
                 case -2:
                     history.Pop();
                     if (history.Count == 0)
@@ -66,8 +66,15 @@ namespace FaqBotServer
                 new InlineKeyboardButton[answer.Count + (history.Count > 0 ? 1 : 0)][];
             for (int i = 0; i < answer.Count; i++)
             {
+                string text = answer[i].Text;
+                string id = answer[i].id.ToString();
+                if(answer[i].Type == AnswerType.Other)
+                {
+                    text = "Другое";
+                    id = "-1";
+                }
                 inlineKeyboard[i] = new InlineKeyboardButton[1]{
-                    new InlineKeyboardCallbackButton(answer[i].Text, answer[i].id.ToString())
+                    new InlineKeyboardCallbackButton(text, id)
                 };
             }
             if (history.Count > 0)
@@ -82,7 +89,7 @@ namespace FaqBotServer
         {
             List<Answer> answer = QuestionsBase.getQuestionBase().GetAnswer(id);
             String text = "Выберите";
-            if(answer[0].Type == AnswerType.Answer)
+            if(answer.Count != 0 && answer[0].Type == AnswerType.Answer)
             {
                 text = answer[0].Text;
             }
