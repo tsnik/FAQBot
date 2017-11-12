@@ -49,7 +49,7 @@ namespace FaqBotServer
                     history.Push(id);
                     break;
             }
-            await openCategory(id, callbackQuery.Message.MessageId);
+            await openButton(id, callbackQuery.Message.MessageId);
         }
 
         #region Private
@@ -59,7 +59,8 @@ namespace FaqBotServer
         private InlineKeyboardMarkup genKeyBoard(List<Answer> answer)
         {
             InlineKeyboardMarkup kb_markup = new InlineKeyboardMarkup();
-            
+            //Не добавлять на кнопки ответы на вопросы
+            answer = answer.FindAll(x => x.Type != AnswerType.Answer);
             //Если есть история, то создаем место под кнопку назад
             InlineKeyboardButton[][] inlineKeyboard = 
                 new InlineKeyboardButton[answer.Count + (history.Count > 0 ? 1 : 0)][];
@@ -77,11 +78,16 @@ namespace FaqBotServer
             kb_markup.InlineKeyboard = inlineKeyboard;
             return kb_markup;
         }
-        private async Task openCategory(int id, int mid)
+        private async Task openButton(int id, int mid)
         {
             List<Answer> answer = QuestionsBase.getQuestionBase().GetAnswer(id);
+            String text = "Выберите";
+            if(answer[0].Type == AnswerType.Answer)
+            {
+                text = answer[0].Text;
+            }
             InlineKeyboardMarkup kb_markup = genKeyBoard(answer);
-            await bot.EditMessageTextAsync(cid, mid, "Choose", replyMarkup: kb_markup);
+            await bot.EditMessageTextAsync(cid, mid, text, replyMarkup: kb_markup);
         }
         #endregion
     }
