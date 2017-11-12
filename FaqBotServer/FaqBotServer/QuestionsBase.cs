@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Linq;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +33,7 @@ namespace FaqBotServer
     {
         public static QuestionsBase getQuestionBase()
         {
-            if(questionBase == null)
+            if (questionBase == null)
             {
                 questionBase = new QuestionsBase(Settings.GetSettings().DBCreds);
                 questionBase.LoadDB();
@@ -46,39 +48,52 @@ namespace FaqBotServer
         /// <param name="pos">Позиция элемента в списке. Для верхнего уровня -1.</param>
         /// <param name="id">Идентификатор родителя. Для верхнего уровня -1.</param>
         /// <returns></returns>
-        public List<Answer> GetAnswer(int pos=-1, int id=-1)
+        public List<Answer> GetAnswer(int id = -1)
         {
-            List<Answer> answer = new List<Answer>();
-            if(pos != -1)
+            Question curr;
+            if (id == -1 || !(curr = dataBase.Questions.First<Question>(x => x.Id == id)).answer)
             {
-                answer.Add(new Answer(AnswerType.Category, "zq", 0));
-                answer.Add(new Answer(AnswerType.Category, "zq", 1));
-                answer.Add(new Answer(AnswerType.Category, "xq", 2));
-                answer.Add(new Answer(AnswerType.Category, "fq", 3));
-                answer.Add(new Answer(AnswerType.Category, "gq", 4));
-                answer.Add(new Answer(AnswerType.Category, "dq", 5));
-                return answer;
+                List<Answer> l = new List<Answer>(dataBase.Questions.Where(x => x.parent == id)
+                    .OrderBy(x => x.pos)
+                    .Select<Question, Answer>(GenAnswerFromQuestion));
+                return l;
             }
-            answer.Add(new Answer(AnswerType.Category, "qq", 0));
-            answer.Add(new Answer(AnswerType.Category, "qq", 1));
-            answer.Add(new Answer(AnswerType.Category, "qq", 2));
-            answer.Add(new Answer(AnswerType.Category, "qq", 3));
-            answer.Add(new Answer(AnswerType.Category, "qq", 4));
-            answer.Add(new Answer(AnswerType.Category, "qq", 5));
+            List<Answer> answer = new List<Answer>();
+            answer.Add(new Answer(AnswerType.Answer, curr.text, curr.Id));
             return answer;
         }
 
         #region Private
         private static QuestionsBase questionBase;
+        private DBCredentials creds;
+        private DataBaseDataContext dataBase;
 
         private QuestionsBase(DBCredentials creds)
         {
-
+            this.creds = creds;
         }
 
         private void LoadDB()
         {
-            return;
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+            builder.DataSource = creds.ServerName;
+            if (creds.User == null)
+                builder.IntegratedSecurity = true;
+            else
+            {
+                builder.UserID = creds.User;
+                builder.Password = creds.Password;
+            }
+            builder.InitialCatalog = creds.DBName;
+            dataBase = new DataBaseDataContext(builder.ConnectionString);
+        }
+
+        private Answer GenAnswerFromQuestion(Question q)
+        {
+            AnswerType t = AnswerType.Category;
+            if (q.other)
+                t = AnswerType.Other;
+            return new Answer(t, q.title, q.Id);
         }
         #endregion
 

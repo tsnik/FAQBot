@@ -8,10 +8,18 @@ namespace FaqBotServer
 {
     struct DBCredentials
     {
-        String ServerName;
-        String DBName;
-        String User;
-        String Password;
+        public String ServerName;
+        public String DBName;
+        public String User;
+        public String Password;
+
+        public DBCredentials(string serverName, string dbName, string user=null, string password=null)
+        {
+            ServerName = serverName;
+            DBName = dbName;
+            User = user;
+            Password = password;
+        }
     }
 
     class Settings
@@ -48,7 +56,7 @@ namespace FaqBotServer
             get
             {
                 //return dbCreds;
-                return new DBCredentials();
+                return new DBCredentials(@"NIKITA-PC\SQLEXPRESS", "Questions");
             }
         }
 
