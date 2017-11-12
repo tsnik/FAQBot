@@ -16,8 +16,8 @@ namespace FaqBotServer
         public Client(long cid, TelegramBotClient bot)
         {
             this.cid = cid;
-            this.qid = -1;
             this.bot = bot;
+            this.history = new Stack<int>();
         }
 
         public async Task OnMessage(Message message)
@@ -26,33 +26,62 @@ namespace FaqBotServer
             if (message == null || message.Type != MessageType.TextMessage) return;
             List<Answer> answer = QuestionsBase.getQuestionBase().GetAnswer();
             InlineKeyboardMarkup kb_markup = genKeyBoard(answer);
-            await bot.SendTextMessageAsync(message.Chat.Id, "Choose" + qid, replyMarkup: kb_markup);
-            qid++;
+            await bot.SendTextMessageAsync(message.Chat.Id, "Choose", replyMarkup: kb_markup);
         }
 
         public async Task OnCallbackQuery(CallbackQuery callbackQuery)
         {
-            List<Answer> answer = QuestionsBase.getQuestionBase().GetAnswer(int.Parse(callbackQuery.Data));
-            InlineKeyboardMarkup kb_markup = genKeyBoard(answer);
-            await bot.EditMessageTextAsync(cid, callbackQuery.Message.MessageId, "Choose" + qid, replyMarkup: kb_markup);
+            int id = int.Parse(callbackQuery.Data);
+            switch (id)
+            {
+                case -1:
+                    break;
+                case -2:
+                    history.Pop();
+                    if (history.Count == 0)
+                    {
+                        id = -1;
+                        break;
+                    }
+                    id = history.Peek();
+                    break;
+                default:
+                    history.Push(id);
+                    break;
+            }
+            await openCategory(id, callbackQuery.Message.MessageId);
         }
 
         #region Private
         private long cid;
-        private int qid;
+        private Stack<int> history;
         private TelegramBotClient bot;
         private InlineKeyboardMarkup genKeyBoard(List<Answer> answer)
         {
             InlineKeyboardMarkup kb_markup = new InlineKeyboardMarkup();
-            InlineKeyboardButton[][] inlineKeyboard = new InlineKeyboardButton[answer.Count][];
+            
+            //Если есть история, то создаем место под кнопку назад
+            InlineKeyboardButton[][] inlineKeyboard = 
+                new InlineKeyboardButton[answer.Count + (history.Count > 0 ? 1 : 0)][];
             for (int i = 0; i < answer.Count; i++)
             {
                 inlineKeyboard[i] = new InlineKeyboardButton[1]{
-                    new InlineKeyboardCallbackButton(answer[i].Text, i.ToString())
+                    new InlineKeyboardCallbackButton(answer[i].Text, answer[i].id.ToString())
                 };
+            }
+            if (history.Count > 0)
+            {
+                inlineKeyboard[answer.Count] = new InlineKeyboardButton[1]{
+                    new InlineKeyboardCallbackButton("Назад", "-2")};
             }
             kb_markup.InlineKeyboard = inlineKeyboard;
             return kb_markup;
+        }
+        private async Task openCategory(int id, int mid)
+        {
+            List<Answer> answer = QuestionsBase.getQuestionBase().GetAnswer(id);
+            InlineKeyboardMarkup kb_markup = genKeyBoard(answer);
+            await bot.EditMessageTextAsync(cid, mid, "Choose", replyMarkup: kb_markup);
         }
         #endregion
     }
