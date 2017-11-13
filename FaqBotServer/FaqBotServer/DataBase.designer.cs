@@ -35,12 +35,6 @@ namespace FaqBotServer
     partial void DeleteQuestion(Question instance);
     #endregion
 		
-		public DataBaseDataContext() : 
-				base(global::FaqBotServer.Properties.Settings.Default.QuestionsConnectionString1, mappingSource)
-		{
-			OnCreated();
-		}
-		
 		public DataBaseDataContext(string connection) : 
 				base(connection, mappingSource)
 		{
