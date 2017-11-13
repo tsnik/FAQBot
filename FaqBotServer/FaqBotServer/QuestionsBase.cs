@@ -63,6 +63,14 @@ namespace FaqBotServer
             return answer;
         }
 
+        public List<Answer> GetElements(List<int> ids)
+        {
+            return new List<Answer>(dataBase.Questions
+                .Where(x => ids.Contains(x.Id))
+                .OrderBy(x => ids.IndexOf(x.Id))
+                .Select<Question, Answer>(GenAnswerFromQuestion));
+        }
+
         #region Private
         private static QuestionsBase questionBase;
         private DBCredentials creds;
