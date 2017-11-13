@@ -38,17 +38,19 @@ namespace FaqBotServer
         public const string BACK = "Назад";
         public const string SEND = "Отправить";
         public const string MAIN = "Главное меню";
+        public const string OTHER = "Другое";
 
-        public State(long cid)
+        public State(long cid, long mid = 0)
         {
             this.cid = cid;
+            this.mid = mid;
         }
 
         public abstract Task<StateResult> OnMessage(Message message, TelegramBotClient bot);
 
         public async Task<StateResult> OnCallbackQuery(CallbackQuery callbackQuery, TelegramBotClient bot)
         {
-            if(callbackQuery.Message.MessageId != mid)
+            if (callbackQuery.Message.MessageId != mid)
             {
                 return new StateResult();
             }
@@ -60,6 +62,14 @@ namespace FaqBotServer
             throw new NotImplementedException();
         }
 
+        public long Mid
+        {
+            get
+            {
+                return mid;
+            }
+        } 
+
 
         protected long cid;
         protected long mid;
@@ -68,6 +78,13 @@ namespace FaqBotServer
             Message m = await bot.SendTextMessageAsync(cid, text, replyMarkup: kb_markup);
             mid = m.MessageId;
         }
+
+        protected async Task sendPhoto(TelegramBotClient bot, FileToSend file, string text, InlineKeyboardMarkup kb_markup = null)
+        {
+            Message m = await bot.SendPhotoAsync(cid, file, text, replyMarkup: kb_markup);
+            mid = m.MessageId;
+        }
+
         protected abstract Task<StateResult> onCallbackQuery(CallbackQuery callbackQuery, TelegramBotClient bot);
     }
 }

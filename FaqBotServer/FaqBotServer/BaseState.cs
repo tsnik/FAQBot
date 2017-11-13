@@ -11,6 +11,8 @@ namespace FaqBotServer
 {
     class BaseState : State
     {
+        public const string MAIN_SELECT = "Сделайте выбор: ";
+
         public BaseState(long cid) : base(cid)
         {
             this.history = new Stack<int>();
@@ -70,7 +72,7 @@ namespace FaqBotServer
                 string id = answer[i].id.ToString();
                 if (answer[i].Type == AnswerType.Other && answer[i].Title == null)
                 {
-                    text = "Другое";
+                    text = OTHER;
                 }
                 inlineKeyboard[i] = new InlineKeyboardButton[1]{
                     new InlineKeyboardCallbackButton(text, id)
@@ -79,7 +81,7 @@ namespace FaqBotServer
             if (history.Count > 0)
             {
                 inlineKeyboard[num] = new InlineKeyboardButton[1]{
-                    new InlineKeyboardCallbackButton("Назад", ((int)Button.Back).ToString())};
+                    new InlineKeyboardCallbackButton(BACK, ((int)Button.Back).ToString())};
             }
             kb_markup.InlineKeyboard = inlineKeyboard;
             return kb_markup;
@@ -96,7 +98,7 @@ namespace FaqBotServer
             if (ans.Type == AnswerType.Category)
             {
                 currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
-                text = "Выберите";
+                text = MAIN_SELECT;
             }
             InlineKeyboardMarkup kb_markup = genKeyBoard(currentList);
             await bot.EditMessageTextAsync(cid, mid, text, replyMarkup: kb_markup);
@@ -106,7 +108,7 @@ namespace FaqBotServer
         {
             currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
             InlineKeyboardMarkup kb_markup = genKeyBoard(currentList);
-            await sendMessage(bot, "Choose", kb_markup);
+            await sendMessage(bot, MAIN_SELECT, kb_markup);
         }
         #endregion
     }

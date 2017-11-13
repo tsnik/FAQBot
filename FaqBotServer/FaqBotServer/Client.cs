@@ -46,7 +46,7 @@ namespace FaqBotServer
 
             if(res.state == ChatState.OTHER)
             {
-                history.Push(new OtherState(cid));
+                history.Push(new OtherState(cid, history.Peek().Mid));
                 await history.Peek().OnMessage(message, bot);
                 return;
             }
@@ -77,7 +77,7 @@ namespace FaqBotServer
 
             if (res.state == ChatState.OTHER)
             {
-                history.Push(new OtherState(cid));
+                history.Push(new OtherState(cid, history.Peek().Mid));
                 await history.Peek().OnCallbackQuery(callbackQuery, bot);
                 return;
             }

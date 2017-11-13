@@ -33,8 +33,9 @@ namespace FaqBotServer
         public const string OTHER_ENTER_NAME = "Введите ваше имя: ";
         public const string OTHER_ENTER_EMAIL = "Введите ваш email: ";
         public const string OTHER_SUBJECT = "Тема";
+        public const string OTHER_SUCCESS = "Письмо успешно отправлено.";
 
-        public OtherState(long cid) : base(cid)
+        public OtherState(long cid, long mid) : base(cid, mid)
         {
 
         }
@@ -65,6 +66,8 @@ namespace FaqBotServer
                         return await SendEmail(bot);
                     case Button.Back:
                         return new StateResult(ChatState.NONE, Action.Back);
+                    case Button.Main:
+                        return new StateResult(ChatState.NONE, Action.Main);
                     default:
                         return new StateResult();
                 }
@@ -93,7 +96,7 @@ namespace FaqBotServer
             }
 
             FileToSend f = new FileToSend(otherPhoto);
-            await bot.SendPhotoAsync(cid, f, text, replyMarkup: kb_markup);
+            await sendPhoto(bot, f, text, kb_markup);
         }
 
         private string genReviewText()
@@ -129,6 +132,16 @@ namespace FaqBotServer
                     new InlineKeyboardCallbackButton(SEND, ((int)Button.Send).ToString())};
             }
 
+            kb_markup.InlineKeyboard = inlineKeyboard;
+            return kb_markup;
+        }
+
+        private InlineKeyboardMarkup genReturnMainKeyBoard()
+        {
+            InlineKeyboardMarkup kb_markup = new InlineKeyboardMarkup();
+            InlineKeyboardButton[][] inlineKeyboard = new InlineKeyboardButton[1][];
+            inlineKeyboard[0] = new InlineKeyboardButton[1]{
+                    new InlineKeyboardCallbackButton(MAIN, ((int)Button.Main).ToString())};
             kb_markup.InlineKeyboard = inlineKeyboard;
             return kb_markup;
         }
@@ -192,7 +205,8 @@ namespace FaqBotServer
             if(creds.User != null) smtp.Credentials = new NetworkCredential(creds.User, creds.Password);
             smtp.EnableSsl = true;
             await smtp.SendMailAsync(m);
-            return new StateResult(ChatState.NONE, Action.Main);
+            await sendMessage(bot, OTHER_SUCCESS, genReturnMainKeyBoard());
+            return new StateResult();
         }
         #endregion
     }
