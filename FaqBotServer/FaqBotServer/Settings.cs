@@ -69,6 +69,7 @@ namespace FaqBotServer
         {
             dbCreds = new DBCredentials(@"NIKITA-PC\SQLEXPRESS", "Questions");
             apiKey = "483580455:AAF_nwfbVQluNkP1d8wHpVMtwW_x8gvMELM";
+            supportEmail = "info@nstsyrlin.ru";
             return;
         }
         #endregion
