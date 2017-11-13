@@ -47,7 +47,7 @@ namespace FaqBotServer
             return new StateResult();
         }
 
-        public override async Task<StateResult> OnCallbackQuery(CallbackQuery callbackQuery, TelegramBotClient bot)
+        protected override async Task<StateResult> onCallbackQuery(CallbackQuery callbackQuery, TelegramBotClient bot)
         {
             int id = int.Parse(callbackQuery.Data);
             int mid = callbackQuery.Message.MessageId;
