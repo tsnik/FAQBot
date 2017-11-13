@@ -88,7 +88,7 @@ namespace FaqBotServer
 
             if (otherPhoto == null)
             {
-                await bot.SendTextMessageAsync(cid, text, replyMarkup: kb_markup);
+                await sendMessage(bot, text, kb_markup);
                 return;
             }
 
@@ -155,8 +155,7 @@ namespace FaqBotServer
                 case OtherStateName.Name:
                     name = message.Text;
                     state = OtherStateName.Email;
-                    Message m = await bot.SendTextMessageAsync(cid, OTHER_ENTER_EMAIL);
-                    mid = m.MessageId;
+                    await sendMessage(bot, OTHER_ENTER_EMAIL);
                     break;
                 case OtherStateName.Email:
                     email = message.Text;
@@ -171,7 +170,7 @@ namespace FaqBotServer
             if (state == OtherStateName.Message)
             {
                 state = OtherStateName.Name;
-                await bot.SendTextMessageAsync(cid, OTHER_ENTER_NAME);
+                await sendMessage(bot, OTHER_ENTER_NAME);
                 return new StateResult();
             }
 

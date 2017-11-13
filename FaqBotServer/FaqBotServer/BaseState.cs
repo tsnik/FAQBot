@@ -106,7 +106,7 @@ namespace FaqBotServer
         {
             currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
             InlineKeyboardMarkup kb_markup = genKeyBoard(currentList);
-            await bot.SendTextMessageAsync(cid, "Choose", replyMarkup: kb_markup);
+            await sendMessage(bot, "Choose", kb_markup);
         }
         #endregion
     }
