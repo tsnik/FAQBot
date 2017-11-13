@@ -70,7 +70,7 @@ namespace FaqBotServer
             }
         }
 
-        public EmailCredentials EmailCred
+        public EmailCredentials EmailCreds
         {
             get
             {
@@ -78,9 +78,18 @@ namespace FaqBotServer
             }
         }
 
+        public string FromEmail
+        {
+            get
+            {
+                return fromEmail;
+            }
+        }
+
         #region Private
         private string apiKey;
         private string supportEmail;
+        private string fromEmail;
         private DBCredentials dbCreds;
         private EmailCredentials emailCreds;
         private static Settings settings;
