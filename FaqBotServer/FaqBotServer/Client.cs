@@ -71,7 +71,7 @@ namespace FaqBotServer
             {
                 history = new Stack<State>();
                 history.Push(new BaseState(cid));
-                await history.Peek().OnCallbackQuery(callbackQuery, bot);
+                await history.Peek().OnMessage(null, bot);
                 return;
             }
 

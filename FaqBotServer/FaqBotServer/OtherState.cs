@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -24,9 +27,12 @@ namespace FaqBotServer
         public const string OTHER_TEXT_ONLY = "Добавьте скриншот или нажмите отправить. Ваш текст: ";
         public const string OTHER_PHOTO_ONLY = "Добавьте комментарий, замените фото или нажмите отправить.";
         public const string OTHER_PHOTO_TEXT = "Замените фото или измените комментарий, если необходимо. Когда вы будете готовы, нажмите отправить. Ваш текст: ";
-        public const string OTHER_YOUR_NAME = "Ваше имя: ";
-        public const string OTHER_YOUR_EMAIL = "Ваш email: ";
-        public const string OTHER_YOUR_MESSAGE = "Ваше сообщене: ";
+        public const string OTHER_YOUR_NAME = "Имя: ";
+        public const string OTHER_YOUR_EMAIL = "Email: ";
+        public const string OTHER_YOUR_MESSAGE = "Ваше сообщение: ";
+        public const string OTHER_ENTER_NAME = "Введите ваше имя: ";
+        public const string OTHER_ENTER_EMAIL = "Введите ваш email: ";
+        public const string OTHER_SUBJECT = "Тема";
 
         public OtherState(long cid) : base(cid)
         {
@@ -40,7 +46,7 @@ namespace FaqBotServer
                 await createMessage(bot, message);
                 return new StateResult();
             }
-            if(message.Type == MessageType.TextMessage)
+            if (message.Type == MessageType.TextMessage)
             {
                 await getNameEmail(bot, message);
             }
@@ -115,12 +121,12 @@ namespace FaqBotServer
                 new InlineKeyboardButton[1 + (send ? 1 : 0)][];
 
             inlineKeyboard[inlineKeyboard.Length - 1] = new InlineKeyboardButton[1]{
-                    new InlineKeyboardCallbackButton("Назад", ((int)Button.Back).ToString())};
+                    new InlineKeyboardCallbackButton(BACK, ((int)Button.Back).ToString())};
 
             if (send)
             {
                 inlineKeyboard[0] = new InlineKeyboardButton[1] {
-                    new InlineKeyboardCallbackButton("Отправить", ((int)Button.Send).ToString())};
+                    new InlineKeyboardCallbackButton(SEND, ((int)Button.Send).ToString())};
             }
 
             kb_markup.InlineKeyboard = inlineKeyboard;
@@ -149,7 +155,8 @@ namespace FaqBotServer
                 case OtherStateName.Name:
                     name = message.Text;
                     state = OtherStateName.Email;
-                    await bot.SendTextMessageAsync(cid, "Ввведите email: ");
+                    Message m = await bot.SendTextMessageAsync(cid, OTHER_ENTER_EMAIL);
+                    mid = m.MessageId;
                     break;
                 case OtherStateName.Email:
                     email = message.Text;
@@ -164,15 +171,29 @@ namespace FaqBotServer
             if (state == OtherStateName.Message)
             {
                 state = OtherStateName.Name;
-                await bot.SendTextMessageAsync(cid, "Ввведите имя: ");
+                await bot.SendTextMessageAsync(cid, OTHER_ENTER_NAME);
+                return new StateResult();
             }
-            return new StateResult();
-            //FileStream stream = new FileStream("test.jpg", FileMode.Create);
-            //        int num = message.Photo.Length - 1;
-            //        /*await bot.GetFileAsync(message.Photo[num].FileId, stream);
-            //        stream.Flush();
-            //        stream.Close();*/
-            //        otherPhoto = message.Photo[num].FileId;
+
+            MailAddress from = new MailAddress(Settings.GetSettings().FromEmail, name);
+            MailAddress to = new MailAddress(Settings.GetSettings().SupportEmail);
+            MailMessage m = new MailMessage(from, to);
+            m.Subject = OTHER_SUBJECT;
+            m.Body = OTHER_YOUR_EMAIL + email + "\n";
+            if (otherText != null)
+                m.Body += otherText;
+            if (otherPhoto != null)
+            {
+                Telegram.Bot.Types.File photo = await bot.GetFileAsync(otherPhoto);
+                string ext = photo.FilePath.Split('.').Last();
+                m.Attachments.Add(new Attachment(photo.FileStream, "file." + ext));
+            }
+            EmailCredentials creds = Settings.GetSettings().EmailCreds;
+            SmtpClient smtp = new SmtpClient(creds.ServerName, creds.Port);
+            if(creds.User != null) smtp.Credentials = new NetworkCredential(creds.User, creds.Password);
+            smtp.EnableSsl = true;
+            await smtp.SendMailAsync(m);
+            return new StateResult(ChatState.NONE, Action.Main);
         }
         #endregion
     }

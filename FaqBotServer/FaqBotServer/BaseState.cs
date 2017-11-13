@@ -18,9 +18,8 @@ namespace FaqBotServer
 
         public override async Task<StateResult> OnMessage(Message message, TelegramBotClient bot)
         {
-            if (message == null || message.Type != MessageType.TextMessage) return new StateResult(ChatState.DEFAULT);
             await showMessage(bot);
-            return new StateResult(ChatState.DEFAULT);
+            return new StateResult();
         }
 
         protected override async Task<StateResult> onCallbackQuery(CallbackQuery callbackQuery, TelegramBotClient bot)
