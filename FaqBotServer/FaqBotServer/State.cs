@@ -11,15 +11,24 @@ namespace FaqBotServer
         Main,
         Back
     }
+
+    enum Button
+    {
+        Back = -2,
+        Send = -3,
+        Main = -4
+    }
     struct StateResult
     {
         public ChatState state;
         public Action action;
+        public object[] data;
 
-        public StateResult(ChatState state = ChatState.NONE, Action action = Action.None)
+        public StateResult(ChatState state = ChatState.NONE, Action action = Action.None, object[] data = null)
         {
             this.state = state;
             this.action = action;
+            this.data = data;
         }
     }
 
