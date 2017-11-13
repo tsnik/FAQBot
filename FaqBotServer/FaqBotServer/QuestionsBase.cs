@@ -18,14 +18,16 @@ namespace FaqBotServer
     struct Answer
     {
         public AnswerType Type;
+        public string Title;
         public string Text;
         public int id;
 
-        public Answer(AnswerType type, string text, int id)
+        public Answer(AnswerType type, int id, string title=null, string text=null)
         {
             Type = type;
             Text = text;
             this.id = id;
+            this.Title = title;
         }
     }
 
@@ -59,7 +61,7 @@ namespace FaqBotServer
                 return l;
             }
             List<Answer> answer = new List<Answer>();
-            answer.Add(new Answer(AnswerType.Answer, curr.text, curr.Id));
+            answer.Add(new Answer(AnswerType.Answer, curr.Id, curr.text));
             return answer;
         }
 
@@ -73,6 +75,10 @@ namespace FaqBotServer
 
         public Answer GetElement(int id)
         {
+            if (id < 0)
+            {
+                return new Answer(AnswerType.Category, -1);
+            }
             return GenAnswerFromQuestion(dataBase.Questions.Where(x => x.Id == id).First());
         }
 
@@ -106,7 +112,9 @@ namespace FaqBotServer
             AnswerType t = AnswerType.Category;
             if (q.other)
                 t = AnswerType.Other;
-            return new Answer(t, q.title, q.Id);
+            if (q.answer)
+                t = AnswerType.Answer;
+            return new Answer(t, q.Id, q.title, q.text);
         }
         #endregion
 
