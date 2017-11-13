@@ -71,6 +71,11 @@ namespace FaqBotServer
                 .Select<Question, Answer>(GenAnswerFromQuestion));
         }
 
+        public Answer GetElement(int id)
+        {
+            return GenAnswerFromQuestion(dataBase.Questions.Where(x => x.Id == id).First());
+        }
+
         #region Private
         private static QuestionsBase questionBase;
         private DBCredentials creds;
