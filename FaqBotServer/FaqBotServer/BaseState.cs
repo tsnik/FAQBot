@@ -26,51 +26,52 @@ namespace FaqBotServer
         public override async Task<StateResult> OnCallbackQuery(CallbackQuery callbackQuery, TelegramBotClient bot)
         {
             int id = int.Parse(callbackQuery.Data);
-            switch (id)
+            if (id < 0)
             {
-                case -1:
-                    return new StateResult(ChatState.OTHER);
-                case -2:
-                    history.Pop();
-                    if (history.Count == 0)
-                    {
-                        id = -1;
-                        break;
-                    }
-                    id = history.Peek();
-                    break;
-                default:
-                    history.Push(id);
-                    break;
+                if ((Button)id == Button.Back)
+                {
+                    if(history.Count > 0) history.Pop();
+                    id = history.Count == 0 ? -1 : history.Peek();
+                }
             }
-            await openButton(id, callbackQuery.Message.MessageId, bot);
-            return new StateResult();
+            Answer ans;
+            if (currentList != null && id != -1)
+            {
+                ans = currentList.Find(x => x.id == id);
+                history.Push(id);
+            }
+            else
+            {
+                ans = QuestionsBase.getQuestionBase().GetElement(id);
+            }
+            return await openButton(ans, callbackQuery.Message.MessageId, bot);
         }
 
         public override async Task Resume(TelegramBotClient bot)
         {
+            history.Pop();
             await showMessage(bot, history.Peek());
         }
 
         #region Private
         private Stack<int> history;
+        private List<Answer> currentList;
 
-        private InlineKeyboardMarkup genKeyBoard(List<Answer> answer)
+        private InlineKeyboardMarkup genKeyBoard(List<Answer> answer = null)
         {
             InlineKeyboardMarkup kb_markup = new InlineKeyboardMarkup();
-            //Не добавлять на кнопки ответы на вопросы
-            answer = answer.FindAll(x => x.Type != AnswerType.Answer);
+            int num = answer == null ? 0 : answer.Count;
             //Если есть история, то создаем место под кнопку назад
             InlineKeyboardButton[][] inlineKeyboard =
-                new InlineKeyboardButton[answer.Count + (history.Count > 0 ? 1 : 0)][];
-            for (int i = 0; i < answer.Count; i++)
+                new InlineKeyboardButton[num + (history.Count > 0 ? 1 : 0)][];
+
+            for (int i = 0; i < num; i++)
             {
-                string text = answer[i].Text;
+                string text = answer[i].Title;
                 string id = answer[i].id.ToString();
-                if (answer[i].Type == AnswerType.Other)
+                if (answer[i].Type == AnswerType.Other && answer[i].Title == null)
                 {
                     text = "Другое";
-                    id = "-1";
                 }
                 inlineKeyboard[i] = new InlineKeyboardButton[1]{
                     new InlineKeyboardCallbackButton(text, id)
@@ -78,27 +79,34 @@ namespace FaqBotServer
             }
             if (history.Count > 0)
             {
-                inlineKeyboard[answer.Count] = new InlineKeyboardButton[1]{
-                    new InlineKeyboardCallbackButton("Назад", "-2")};
+                inlineKeyboard[num] = new InlineKeyboardButton[1]{
+                    new InlineKeyboardCallbackButton("Назад", ((int)Button.Back).ToString())};
             }
             kb_markup.InlineKeyboard = inlineKeyboard;
             return kb_markup;
         }
-        private async Task openButton(int id, int mid, TelegramBotClient bot)
+        private async Task<StateResult> openButton(Answer ans, int mid, TelegramBotClient bot)
         {
-            List<Answer> answer = QuestionsBase.getQuestionBase().GetAnswer(id);
-            String text = "Выберите";
-            if (answer.Count != 0 && answer[0].Type == AnswerType.Answer)
+            if (ans.Type == AnswerType.Other)
             {
-                text = answer[0].Text;
+                return new StateResult(ChatState.OTHER);
             }
-            InlineKeyboardMarkup kb_markup = genKeyBoard(answer);
+            String text = ans.Text;
+            currentList = null;
+            int id = ans.id;
+            if (ans.Type == AnswerType.Category)
+            {
+                currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
+                text = "Выберите";
+            }
+            InlineKeyboardMarkup kb_markup = genKeyBoard(currentList);
             await bot.EditMessageTextAsync(cid, mid, text, replyMarkup: kb_markup);
+            return new StateResult();
         }
         private async Task showMessage(TelegramBotClient bot, int id = -1)
         {
-            List<Answer> answer = QuestionsBase.getQuestionBase().GetAnswer(id);
-            InlineKeyboardMarkup kb_markup = genKeyBoard(answer);
+            currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
+            InlineKeyboardMarkup kb_markup = genKeyBoard(currentList);
             await bot.SendTextMessageAsync(cid, "Choose", replyMarkup: kb_markup);
         }
         #endregion

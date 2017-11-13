@@ -11,21 +11,21 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FaqBotServer
 {
-    class OtherState:State
+    class OtherState : State
     {
         public const string OTHER_TEXT_DEF = "Пришлите скриншот и опишите проблему, с которой Вы столкнулись, на адрес deltapro @deltacredit.ru или в этот чат";
         public const string OTHER_TEXT_ONLY = "Добавьте скриншот или нажмите отправить. Ваш текст: ";
         public const string OTHER_PHOTO_ONLY = "Добавьте комментарий, замените фото или нажмите отправить.";
         public const string OTHER_PHOTO_TEXT = "Замените фото или измените комментарий, если необходимо. Когда вы будете готовы, нажмите отправить. Ваш текст: ";
 
-        public OtherState(long cid): base(cid)
+        public OtherState(long cid) : base(cid)
         {
-            
+
         }
 
         public override async Task<StateResult> OnMessage(Message message, TelegramBotClient bot)
         {
-            if(message.Type == MessageType.PhotoMessage)
+            if (message.Type == MessageType.PhotoMessage)
             {
                 int num = message.Photo.Length;
                 otherPhoto = message.Photo[num - 1].FileId;
@@ -46,15 +46,22 @@ namespace FaqBotServer
         {
             int id = int.Parse(callbackQuery.Data);
             int mid = callbackQuery.Message.MessageId;
-            switch (id)
+            if (id < 0)
             {
-                case -2:
-                    return new StateResult(ChatState.NONE, Action.Back);
-                default:
-                    InlineKeyboardMarkup kb_markup = genKeyBoard();
-                    await bot.EditMessageTextAsync(cid, mid, OTHER_TEXT_DEF, replyMarkup: kb_markup);
-                    return new StateResult();
+                switch ((Button)id)
+                {
+                    case Button.Send:
+                        await SendEmail();
+                        return new StateResult(action: Action.Main);
+                    case Button.Back:
+                        return new StateResult(ChatState.NONE, Action.Back);
+                    default:
+                        return new StateResult();
+                }
             }
+            InlineKeyboardMarkup kb_markup = genKeyBoard();
+            await bot.EditMessageTextAsync(cid, mid, OTHER_TEXT_DEF, replyMarkup: kb_markup);
+            return new StateResult();
         }
 
         #region Private
@@ -88,12 +95,12 @@ namespace FaqBotServer
                 new InlineKeyboardButton[1 + (send ? 1 : 0)][];
 
             inlineKeyboard[inlineKeyboard.Length - 1] = new InlineKeyboardButton[1]{
-                    new InlineKeyboardCallbackButton("Назад", "-2")};
+                    new InlineKeyboardCallbackButton("Назад", ((int)Button.Back).ToString())};
 
-            if(send)
+            if (send)
             {
                 inlineKeyboard[0] = new InlineKeyboardButton[1] {
-                    new InlineKeyboardCallbackButton("Отправить","-42")};
+                    new InlineKeyboardCallbackButton("Отправить", ((int)Button.Send).ToString())};
             }
 
             kb_markup.InlineKeyboard = inlineKeyboard;
