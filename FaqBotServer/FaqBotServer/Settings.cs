@@ -4,15 +4,31 @@ namespace FaqBotServer
 {
     struct DBCredentials
     {
-        public String ServerName;
-        public String DBName;
-        public String User;
-        public String Password;
+        public string ServerName;
+        public string DBName;
+        public string User;
+        public string Password;
 
         public DBCredentials(string serverName, string dbName, string user=null, string password=null)
         {
             ServerName = serverName;
             DBName = dbName;
+            User = user;
+            Password = password;
+        }
+    }
+
+    struct EmailCredentials
+    {
+        public string ServerName;
+        public int Port;
+        public string User;
+        public string Password;
+
+        public EmailCredentials(string serverName, int port, string user = null, string password = null)
+        {
+            ServerName = serverName;
+            Port = port;
             User = user;
             Password = password;
         }
@@ -54,10 +70,19 @@ namespace FaqBotServer
             }
         }
 
+        public EmailCredentials EmailCred
+        {
+            get
+            {
+                return emailCreds;
+            }
+        }
+
         #region Private
         private string apiKey;
         private string supportEmail;
         private DBCredentials dbCreds;
+        private EmailCredentials emailCreds;
         private static Settings settings;
 
         private Settings()
