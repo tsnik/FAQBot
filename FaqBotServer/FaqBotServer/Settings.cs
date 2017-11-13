@@ -38,8 +38,7 @@ namespace FaqBotServer
         {
             get
             {
-                //return apiKey;
-                return "483580455:AAF_nwfbVQluNkP1d8wHpVMtwW_x8gvMELM";
+                return apiKey;
             }
         }
 
@@ -55,8 +54,7 @@ namespace FaqBotServer
         {
             get
             {
-                //return dbCreds;
-                return new DBCredentials(@"NIKITA-PC\SQLEXPRESS", "Questions");
+                return dbCreds;
             }
         }
 
@@ -73,6 +71,8 @@ namespace FaqBotServer
 
         public void LoadSettings()
         {
+            dbCreds = new DBCredentials(@"NIKITA-PC\SQLEXPRESS", "Questions");
+            apiKey = "483580455:AAF_nwfbVQluNkP1d8wHpVMtwW_x8gvMELM";
             return;
         }
         #endregion
