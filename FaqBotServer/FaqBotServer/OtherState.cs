@@ -35,9 +35,13 @@ namespace FaqBotServer
         public const string OTHER_SUBJECT = "Тема";
         public const string OTHER_SUCCESS = "Письмо успешно отправлено.";
 
-        public OtherState(long cid, long mid) : base(cid, mid)
+        public OtherState(long cid, long mid, object[] data) : base(cid, mid)
         {
-
+            this.text = OTHER_TEXT_DEF;
+            if(data[0] != null)
+            {
+                this.text = (string)data[0];
+            }
         }
 
         public override async Task<StateResult> OnMessage(Message message, TelegramBotClient bot)
@@ -73,7 +77,7 @@ namespace FaqBotServer
                 }
             }
             InlineKeyboardMarkup kb_markup = genKeyBoard();
-            await bot.EditMessageTextAsync(cid, mid, OTHER_TEXT_DEF, replyMarkup: kb_markup);
+            await bot.EditMessageTextAsync(cid, mid, text, replyMarkup: kb_markup);
             state = OtherStateName.Message;
             return new StateResult();
         }
@@ -84,6 +88,7 @@ namespace FaqBotServer
         private string otherText;
         private string name;
         private string email;
+        private string text;
         private async Task sendReview(TelegramBotClient bot)
         {
             InlineKeyboardMarkup kb_markup = genKeyBoard(true);

@@ -43,13 +43,6 @@ namespace FaqBotServer
                 await history.Peek().OnMessage(message, bot);
                 return;
             }
-
-            if(res.state == ChatState.OTHER)
-            {
-                history.Push(new OtherState(cid, history.Peek().Mid));
-                await history.Peek().OnMessage(message, bot);
-                return;
-            }
         }
 
         public async Task OnCallbackQuery(CallbackQuery callbackQuery)
@@ -77,7 +70,7 @@ namespace FaqBotServer
 
             if (res.state == ChatState.OTHER)
             {
-                history.Push(new OtherState(cid, history.Peek().Mid));
+                history.Push(new OtherState(cid, history.Peek().Mid, res.data));
                 await history.Peek().OnCallbackQuery(callbackQuery, bot);
                 return;
             }
