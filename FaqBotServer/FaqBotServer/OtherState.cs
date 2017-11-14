@@ -32,7 +32,7 @@ namespace FaqBotServer
         public const string OTHER_YOUR_MESSAGE = "Ваше сообщение: ";
         public const string OTHER_ENTER_NAME = "Введите ваше имя: ";
         public const string OTHER_ENTER_EMAIL = "Введите ваш email: ";
-        public const string OTHER_SUBJECT = "Тема";
+        public const string OTHER_SUBJECT = "Чат-бот DeltaPro";
         public const string OTHER_SUCCESS = "Письмо успешно отправлено.";
 
         public OtherState(long cid, long mid, object[] data) : base(cid, mid)
