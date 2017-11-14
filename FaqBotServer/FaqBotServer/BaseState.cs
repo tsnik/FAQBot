@@ -90,7 +90,7 @@ namespace FaqBotServer
         {
             if (ans.Type == AnswerType.Other)
             {
-                return new StateResult(ChatState.OTHER, data: new object[1] {ans.Text});
+                return new StateResult(ChatState.OTHER, data: new object[2] {ans.Text, history});
             }
             String text = ans.Text;
             currentList = null;

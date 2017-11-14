@@ -42,6 +42,10 @@ namespace FaqBotServer
             {
                 this.text = (string)data[0];
             }
+            if(data[1] != null)
+            {
+                this.history = (Stack<int>)data[1];
+            }
         }
 
         public override async Task<StateResult> OnMessage(Message message, TelegramBotClient bot)
@@ -89,6 +93,7 @@ namespace FaqBotServer
         private string name;
         private string email;
         private string text;
+        private Stack<int> history;
         private async Task sendReview(TelegramBotClient bot)
         {
             InlineKeyboardMarkup kb_markup = genKeyBoard(true);
@@ -197,6 +202,7 @@ namespace FaqBotServer
             MailMessage m = new MailMessage(from, to);
             m.Subject = OTHER_SUBJECT;
             m.Body = OTHER_YOUR_EMAIL + email + "\n";
+            m.Body += genHistoryLine() + "\n";
             if (otherText != null)
                 m.Body += otherText;
             if (otherPhoto != null)
@@ -205,6 +211,7 @@ namespace FaqBotServer
                 string ext = photo.FilePath.Split('.').Last();
                 m.Attachments.Add(new Attachment(photo.FileStream, "file." + ext));
             }
+            m.BodyEncoding = Encoding.UTF8;
             EmailCredentials creds = Settings.GetSettings().EmailCreds;
             SmtpClient smtp = new SmtpClient(creds.ServerName, creds.Port);
             if(creds.User != null) smtp.Credentials = new NetworkCredential(creds.User, creds.Password);
@@ -212,6 +219,13 @@ namespace FaqBotServer
             await smtp.SendMailAsync(m);
             await sendMessage(bot, OTHER_SUCCESS, genReturnMainKeyBoard());
             return new StateResult();
+        }
+
+        private string genHistoryLine()
+        {
+            history.Pop();
+            List<Answer> l = QuestionsBase.getQuestionBase().GetElements(history.ToList());
+            return string.Join("->", l.ConvertAll<string>((x => x.Title)).ToArray());
         }
         #endregion
     }
