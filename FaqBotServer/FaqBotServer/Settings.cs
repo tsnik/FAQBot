@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace FaqBotServer
 {
@@ -9,12 +10,26 @@ namespace FaqBotServer
         public string User;
         public string Password;
 
-        public DBCredentials(string serverName, string dbName, string user=null, string password=null)
+        public DBCredentials(string serverName, string dbName, string user = null, string password = null)
         {
             ServerName = serverName;
             DBName = dbName;
             User = user;
             Password = password;
+        }
+
+        public DBCredentials(string line)
+        {
+            String[] rawDbCreds = line.Trim().Split(';');
+            ServerName = rawDbCreds[0];
+            DBName = rawDbCreds[1];
+            User = null;
+            Password = null;
+            if (rawDbCreds.Length > 2)
+            {
+                User = rawDbCreds[2];
+                Password = rawDbCreds[3];
+            }
         }
     }
 
@@ -32,13 +47,27 @@ namespace FaqBotServer
             User = user;
             Password = password;
         }
+
+        public EmailCredentials(string line)
+        {
+            String[] rawEmailCreds = line.Trim().Split(';');
+            ServerName = rawEmailCreds[0];
+            Port = int.Parse(rawEmailCreds[1]);
+            User = null;
+            Password = null;
+            if (rawEmailCreds.Length > 2)
+            {
+                User = rawEmailCreds[2];
+                Password = rawEmailCreds[3];
+            }
+        }
     }
 
     class Settings
     {
         public static Settings GetSettings()
         {
-            if(settings == null)
+            if (settings == null)
             {
                 settings = new Settings();
                 settings.LoadSettings();
@@ -101,9 +130,18 @@ namespace FaqBotServer
 
         public void LoadSettings()
         {
-            dbCreds = new DBCredentials(@"NIKITA-PC\SQLEXPRESS", "Questions");
-            apiKey = "483580455:AAF_nwfbVQluNkP1d8wHpVMtwW_x8gvMELM";
-            supportEmail = "info@nstsyrlin.ru";
+            //apiKey
+            //serverName;DbName;user;pass
+            //supportEmail
+            //fromEmail
+            //server;port;user;pass
+            StreamReader f = new StreamReader("settings.cfg");
+            apiKey = f.ReadLine();
+            dbCreds = new DBCredentials(f.ReadLine());
+            supportEmail = f.ReadLine();
+            fromEmail = f.ReadLine();
+            emailCreds = new EmailCredentials(f.ReadLine());
+            f.Close();
             return;
         }
         #endregion
