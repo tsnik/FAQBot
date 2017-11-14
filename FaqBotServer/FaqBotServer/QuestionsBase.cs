@@ -69,6 +69,7 @@ namespace FaqBotServer
         {
             return new List<Answer>(dataBase.Questions
                 .Where(x => ids.Contains(x.Id))
+                .ToList()
                 .OrderBy(x => ids.IndexOf(x.Id))
                 .Select<Question, Answer>(GenAnswerFromQuestion));
         }
