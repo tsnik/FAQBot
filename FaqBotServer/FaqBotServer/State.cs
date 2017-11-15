@@ -74,7 +74,7 @@ namespace FaqBotServer
 
         protected long cid;
         protected long mid;
-        protected async Task sendMessage(TelegramBotClient bot, string text, InlineKeyboardMarkup kb_markup = null)
+        protected async Task sendMessage(TelegramBotClient bot, string text, IReplyMarkup kb_markup = null)
         {
             Message m = await bot.SendTextMessageAsync(cid, text, replyMarkup: kb_markup);
             mid = m.MessageId;

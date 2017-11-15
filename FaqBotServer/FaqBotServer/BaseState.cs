@@ -9,6 +9,18 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FaqBotServer
 {
+    struct MessageToSend
+    {
+        public string Text;
+        public IReplyMarkup KeyboardMarkup;
+
+        public MessageToSend(string text, IReplyMarkup keyboardMarkup = null)
+        {
+            Text = text;
+            KeyboardMarkup = keyboardMarkup;
+        }
+    }
+
     class BaseState : State
     {
         public const string MAIN_SELECT = "С чем у вас возникла проблема?";
@@ -16,6 +28,7 @@ namespace FaqBotServer
         public BaseState(long cid) : base(cid)
         {
             this.history = new Stack<int>();
+            this.genMessage = this.genMessageText;
         }
 
         public override async Task<StateResult> OnMessage(Message message, TelegramBotClient bot)
@@ -31,7 +44,7 @@ namespace FaqBotServer
             {
                 if ((Button)id == Button.Back)
                 {
-                    if(history.Count > 0) history.Pop();
+                    if (history.Count > 0) history.Pop();
                     id = history.Count == 0 ? -1 : history.Peek();
                 }
             }
@@ -57,26 +70,39 @@ namespace FaqBotServer
         #region Private
         private Stack<int> history;
         private List<Answer> currentList;
+        private delegate Task<MessageToSend> MessageGenerator(int id=-1);
+        private MessageGenerator genMessage;
 
-        private InlineKeyboardMarkup genKeyBoard(List<Answer> answer = null)
+        private InlineKeyboardMarkup genKeyBoard(List<Answer> answer = null, bool oneline = false)
         {
             InlineKeyboardMarkup kb_markup = new InlineKeyboardMarkup();
             int num = answer == null ? 0 : answer.Count;
+            int linecount = oneline ? 1 : num;
             //Если есть история, то создаем место под кнопку назад
             InlineKeyboardButton[][] inlineKeyboard =
-                new InlineKeyboardButton[num + (history.Count > 0 ? 1 : 0)][];
+                new InlineKeyboardButton[linecount+ (history.Count > 0 ? 1 : 0)][];
+
+            if (oneline)
+            {
+                inlineKeyboard[0] = new InlineKeyboardButton[num];
+            }
 
             for (int i = 0; i < num; i++)
             {
                 string text = answer[i].Title;
                 string id = answer[i].id.ToString();
+                if(oneline)
+                {
+                    inlineKeyboard[0][i] = new InlineKeyboardCallbackButton(text, id);
+                    continue;
+                }
                 inlineKeyboard[i] = new InlineKeyboardButton[1]{
                     new InlineKeyboardCallbackButton(text, id)
                 };
             }
             if (history.Count > 0)
             {
-                inlineKeyboard[num] = new InlineKeyboardButton[1]{
+                inlineKeyboard[linecount] = new InlineKeyboardButton[1]{
                     new InlineKeyboardCallbackButton(BACK, ((int)Button.Back).ToString())};
             }
             kb_markup.InlineKeyboard = inlineKeyboard;
@@ -86,25 +112,53 @@ namespace FaqBotServer
         {
             if (ans.Type == AnswerType.Other)
             {
-                return new StateResult(ChatState.OTHER, data: new object[2] {ans.Text, history});
+                return new StateResult(ChatState.OTHER, data: new object[2] { ans.Text, history });
             }
             String text = ans.Text;
             currentList = null;
             int id = ans.id;
+            IReplyMarkup kb_markup;
             if (ans.Type == AnswerType.Category)
             {
-                currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
-                text = MAIN_SELECT;
+                MessageToSend m = await genMessage(id);
+                text = m.Text;
+                kb_markup = m.KeyboardMarkup;
             }
-            InlineKeyboardMarkup kb_markup = genKeyBoard(currentList);
+            else
+            {
+                kb_markup = genKeyBoard(currentList);
+            }
+
             await bot.EditMessageTextAsync(cid, mid, text, replyMarkup: kb_markup);
             return new StateResult();
         }
+
         private async Task showMessage(TelegramBotClient bot, int id = -1)
         {
+            MessageToSend m = await genMessage(id);
+            await sendMessage(bot, m.Text, m.KeyboardMarkup);
+        }
+
+        private async Task<MessageToSend> genMessageButtons(int id = -1)
+        {
             currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
+            string text = MAIN_SELECT;
             InlineKeyboardMarkup kb_markup = genKeyBoard(currentList);
-            await sendMessage(bot, MAIN_SELECT, kb_markup);
+            return new MessageToSend(text, kb_markup);
+        }
+
+        private async Task<MessageToSend> genMessageText(int id = -1)
+        {
+            currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
+            List<Answer> tmp = new List<Answer>(currentList);
+            string text = MAIN_SELECT + "\n";
+            for (int i = 0; i < tmp.Count; i++)
+            {
+                text += (i + 1).ToString() + ". " + tmp[i].Title + "\n";
+                tmp[i] = new Answer(tmp[i].Type, tmp[i].id, (i + 1).ToString());
+            }
+            InlineKeyboardMarkup kb_markup = genKeyBoard(tmp, true);
+            return new MessageToSend(text, kb_markup);
         }
         #endregion
     }
