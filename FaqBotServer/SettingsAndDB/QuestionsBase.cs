@@ -17,7 +17,7 @@ namespace SettingsAndDB
     public struct Answer
     {
         public const string TITLE_DEF = "Другое";
-        public const string TEXT_DEF = "Пришлите скриншот и опишите проблему, с которой Вы столкнулись, на адрес deltapro @deltacredit.ru или в этот чат";
+        public const string TEXT_DEF = "Пришлите скриншот и опишите проблему, с которой Вы столкнулись, на адрес deltapro@deltacredit.ru или в этот чат";
 
 
 
