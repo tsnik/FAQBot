@@ -54,25 +54,22 @@ namespace FAQConfigurator
         private void dlgSaveSettings_FileOk(object sender, CancelEventArgs e)
         {
             Settings st = Settings.GetSettings();
-            st.ApiKey = parseString(tbApiKey, true);
-            st.DBCreds = new DBCredentials(parseString(tbServerName, true),
-                parseString(tbDatabaseName, true),
-                parseString(tbDatabaseUser), parseString(tbDatabasePassword));
-            st.EmailCreds = new EmailCredentials(parseString(tbEmailServer, true),
-                parseInt(tbEmailPort, true),
-                parseString(tbEmailUser), parseString(tbEmailPassword));
-            st.FromEmail = parseString(tbEmailFrom, true);
-            st.SupportEmail = parseString(tbEmailTo, true);
+            st.ApiKey = Utils.ParseString(tbApiKey, true);
+            st.DBCreds = new DBCredentials(Utils.ParseString(tbServerName, true),
+                Utils.ParseString(tbDatabaseName, true),
+                Utils.ParseString(tbDatabaseUser), Utils.ParseString(tbDatabasePassword));
+            st.EmailCreds = new EmailCredentials(Utils.ParseString(tbEmailServer, true),
+                Utils.ParseInt(tbEmailPort, true),
+                Utils.ParseString(tbEmailUser), Utils.ParseString(tbEmailPassword));
+            st.FromEmail = Utils.ParseString(tbEmailFrom, true);
+            st.SupportEmail = Utils.ParseString(tbEmailTo, true);
             st.SaveSettings(dlgSaveSettings.FileName);
         }
 
-        private string parseString(TextBox tb, bool required = false)
+        private void btnEditDatabase_Click(object sender, EventArgs e)
         {
-            return tb.Text == "" ? null : tb.Text;
-        }
-        private int parseInt(TextBox tb, bool required = false)
-        {
-            return int.Parse(tb.Text);
+            DatabaseEditForm form = new DatabaseEditForm();
+            form.Show();
         }
     }
 }

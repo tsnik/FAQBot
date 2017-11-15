@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Linq;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -104,6 +105,17 @@ namespace SettingsAndDB
                 return new Answer(AnswerType.Category, -1);
             }
             return GenAnswerFromQuestion(dataBase.Questions.Where(x => x.Id == id).First());
+        }
+
+        public Table<Question> GetTable()
+        {
+            return dataBase.Questions;
+        }
+
+        public void Update()
+        {
+            dataBase.SubmitChanges();
+            dataBase.Refresh(RefreshMode.OverwriteCurrentValues, dataBase.Questions);
         }
 
         #region Private
