@@ -49,11 +49,13 @@ namespace FaqBotServer
 
         public async Task<StateResult> OnCallbackQuery(CallbackQuery callbackQuery, TelegramBotClient bot)
         {
-            if (callbackQuery.Message.MessageId != mid)
+            StateResult result = new StateResult();
+            if (callbackQuery.Message.MessageId == mid)
             {
-                return new StateResult();
+                result = await onCallbackQuery(callbackQuery, bot);
             }
-            return await onCallbackQuery(callbackQuery, bot);
+            await bot.AnswerCallbackQueryAsync(callbackQuery.Id);
+            return result;
         }
 
         public virtual Task Resume(TelegramBotClient bot)
