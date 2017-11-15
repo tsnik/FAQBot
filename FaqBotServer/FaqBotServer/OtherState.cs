@@ -28,11 +28,12 @@ namespace FaqBotServer
         public const string OTHER_PHOTO_TEXT = "Замените фото или измените комментарий, если необходимо. Когда вы будете готовы, нажмите отправить. Ваш текст: ";
         public const string OTHER_YOUR_NAME = "Имя: ";
         public const string OTHER_YOUR_EMAIL = "Email: ";
-        public const string OTHER_YOUR_MESSAGE = "Ваше сообщение: ";
+        public const string OTHER_YOUR_MESSAGE = "Cообщение: ";
         public const string OTHER_ENTER_NAME = "Введите ваше имя: ";
         public const string OTHER_ENTER_EMAIL = "Введите ваш email: ";
         public const string OTHER_SUBJECT = "Чат-бот DeltaPro";
         public const string OTHER_SUCCESS = "Письмо успешно отправлено.";
+        public const string OTHER_CATEGORY = "Категория: ";
 
         public OtherState(long cid, long mid, object[] data) : base(cid, mid)
         {
@@ -197,9 +198,9 @@ namespace FaqBotServer
             MailMessage m = new MailMessage(from, to);
             m.Subject = OTHER_SUBJECT;
             m.Body = OTHER_YOUR_EMAIL + email + "\n";
-            m.Body += genHistoryLine() + "\n";
+            m.Body += OTHER_CATEGORY + genHistoryLine() + "\n";
             if (otherText != null)
-                m.Body += otherText;
+                m.Body += OTHER_YOUR_MESSAGE + otherText;
             if (otherPhoto != null)
             {
                 Telegram.Bot.Types.File photo = await bot.GetFileAsync(otherPhoto);
