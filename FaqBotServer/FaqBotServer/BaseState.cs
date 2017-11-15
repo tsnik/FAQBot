@@ -11,7 +11,7 @@ namespace FaqBotServer
 {
     class BaseState : State
     {
-        public const string MAIN_SELECT = "Сделайте выбор: ";
+        public const string MAIN_SELECT = "С чем у вас возникла проблема?";
 
         public BaseState(long cid) : base(cid)
         {
@@ -70,10 +70,6 @@ namespace FaqBotServer
             {
                 string text = answer[i].Title;
                 string id = answer[i].id.ToString();
-                if (answer[i].Type == AnswerType.Other && answer[i].Title == null)
-                {
-                    text = OTHER;
-                }
                 inlineKeyboard[i] = new InlineKeyboardButton[1]{
                     new InlineKeyboardCallbackButton(text, id)
                 };

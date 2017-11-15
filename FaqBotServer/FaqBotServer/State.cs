@@ -38,7 +38,6 @@ namespace FaqBotServer
         public const string BACK = "Назад";
         public const string SEND = "Отправить";
         public const string MAIN = "Главное меню";
-        public const string OTHER = "Другое";
 
         public State(long cid, long mid = 0)
         {

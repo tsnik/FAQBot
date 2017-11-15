@@ -17,18 +17,42 @@ namespace FaqBotServer
 
     struct Answer
     {
+        public const string TITLE_DEF = "Другое";
+        public const string TEXT_DEF = "Пришлите скриншот и опишите проблему, с которой Вы столкнулись, на адрес deltapro @deltacredit.ru или в этот чат";
+
+
+
         public AnswerType Type;
-        public string Title;
-        public string Text;
+        public string Text
+        {
+            get
+            {
+                if (text == null && Type == AnswerType.Other)
+                    return TEXT_DEF;
+                return text;
+            }
+        }
+        public string Title
+        {
+            get
+            {
+                if (title == null && Type == AnswerType.Other)
+                    return TITLE_DEF;
+                return title;
+            }
+        }
         public int id;
 
         public Answer(AnswerType type, int id, string title=null, string text=null)
         {
             Type = type;
-            Text = text;
+            this.text = text;
             this.id = id;
-            this.Title = title;
+            this.title = title;
         }
+
+        private string title;
+        private string text;
     }
 
     class QuestionsBase

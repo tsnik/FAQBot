@@ -23,7 +23,6 @@ namespace FaqBotServer
     }
     class OtherState : State
     {
-        public const string OTHER_TEXT_DEF = "Пришлите скриншот и опишите проблему, с которой Вы столкнулись, на адрес deltapro @deltacredit.ru или в этот чат";
         public const string OTHER_TEXT_ONLY = "Добавьте скриншот или нажмите отправить. Ваш текст: ";
         public const string OTHER_PHOTO_ONLY = "Добавьте комментарий, замените фото или нажмите отправить.";
         public const string OTHER_PHOTO_TEXT = "Замените фото или измените комментарий, если необходимо. Когда вы будете готовы, нажмите отправить. Ваш текст: ";
@@ -37,11 +36,7 @@ namespace FaqBotServer
 
         public OtherState(long cid, long mid, object[] data) : base(cid, mid)
         {
-            this.text = OTHER_TEXT_DEF;
-            if(data[0] != null)
-            {
-                this.text = (string)data[0];
-            }
+            this.text = (string)data[0];
             if(data[1] != null)
             {
                 this.history = (Stack<int>)data[1];
@@ -223,7 +218,6 @@ namespace FaqBotServer
 
         private string genHistoryLine()
         {
-            history.Pop();
             List<Answer> l = QuestionsBase.getQuestionBase().GetElements(history.ToList());
             return string.Join("->", l.ConvertAll<string>((x => x.Title)).ToArray());
         }
