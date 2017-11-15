@@ -31,6 +31,24 @@ namespace SettingsAndDB
                 Password = rawDbCreds[3];
             }
         }
+
+        public override string ToString()
+        {
+            string[] tmp;
+            if(User != null)
+            {
+                tmp = new string[4];
+                tmp[2] = User;
+                tmp[3] = Password;
+            }
+            else
+            {
+                tmp = new string[2];
+            }
+            tmp[0] = ServerName;
+            tmp[1] = DBName;
+            return string.Join(";", tmp);
+        }
     }
 
     public struct EmailCredentials
@@ -61,10 +79,29 @@ namespace SettingsAndDB
                 Password = rawEmailCreds[3];
             }
         }
+        public override string ToString()
+        {
+            string[] tmp;
+            if (User != null)
+            {
+                tmp = new string[4];
+                tmp[2] = User;
+                tmp[3] = Password;
+            }
+            else
+            {
+                tmp = new string[2];
+            }
+            tmp[0] = ServerName;
+            tmp[1] = Port.ToString();
+            return string.Join(";", tmp);
+        }
     }
 
     public class Settings
     {
+        public const string DEF_FILENAME = "settings.cfg";
+
         public static Settings GetSettings()
         {
             if (settings == null)
@@ -81,6 +118,10 @@ namespace SettingsAndDB
             {
                 return apiKey;
             }
+            set
+            {
+                apiKey = value;
+            }
         }
 
         public string SupportEmail
@@ -88,6 +129,10 @@ namespace SettingsAndDB
             get
             {
                 return supportEmail;
+            }
+            set
+            {
+                supportEmail = value;
             }
         }
 
@@ -97,6 +142,10 @@ namespace SettingsAndDB
             {
                 return dbCreds;
             }
+            set
+            {
+                dbCreds = value;
+            }
         }
 
         public EmailCredentials EmailCreds
@@ -105,6 +154,10 @@ namespace SettingsAndDB
             {
                 return emailCreds;
             }
+            set
+            {
+                emailCreds = value;
+            }
         }
 
         public string FromEmail
@@ -112,6 +165,10 @@ namespace SettingsAndDB
             get
             {
                 return fromEmail;
+            }
+            set
+            {
+                fromEmail = value;
             }
         }
 
@@ -128,14 +185,14 @@ namespace SettingsAndDB
 
         }
 
-        public void LoadSettings()
+        public void LoadSettings(string filename = DEF_FILENAME)
         {
             //apiKey
             //serverName;DbName;user;pass
             //supportEmail
             //fromEmail
             //server;port;user;pass
-            StreamReader f = new StreamReader("settings.cfg");
+            StreamReader f = new StreamReader(filename);
             apiKey = f.ReadLine();
             dbCreds = new DBCredentials(f.ReadLine());
             supportEmail = f.ReadLine();
@@ -144,6 +201,18 @@ namespace SettingsAndDB
             f.Close();
             return;
         }
+        public void SaveSettings(string filename = DEF_FILENAME)
+        {
+            StreamWriter f = new StreamWriter(filename, false);
+            f.WriteLine(apiKey);
+            f.WriteLine(dbCreds.ToString());
+            f.WriteLine(supportEmail);
+            f.WriteLine(fromEmail);
+            f.WriteLine(emailCreds.ToString());
+            f.Flush();
+            f.Close();
+        }
+
         #endregion
     }
 }
