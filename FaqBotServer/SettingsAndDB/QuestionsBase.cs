@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Linq;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FaqBotServer
+namespace SettingsAndDB
 {
-    enum AnswerType
+    public enum AnswerType
     {
         Category,
         Answer,
         Other
     }
 
-    struct Answer
+    public struct Answer
     {
         public const string TITLE_DEF = "Другое";
         public const string TEXT_DEF = "Пришлите скриншот и опишите проблему, с которой Вы столкнулись, на адрес deltapro @deltacredit.ru или в этот чат";
@@ -43,7 +42,7 @@ namespace FaqBotServer
         }
         public int id;
 
-        public Answer(AnswerType type, int id, string title=null, string text=null)
+        public Answer(AnswerType type, int id, string title = null, string text = null)
         {
             Type = type;
             this.text = text;
@@ -55,7 +54,7 @@ namespace FaqBotServer
         private string text;
     }
 
-    class QuestionsBase
+    public class QuestionsBase
     {
         public static QuestionsBase getQuestionBase()
         {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 
-namespace FaqBotServer
+namespace SettingsAndDB
 {
-    struct DBCredentials
+    public struct DBCredentials
     {
         public string ServerName;
         public string DBName;
@@ -33,7 +33,7 @@ namespace FaqBotServer
         }
     }
 
-    struct EmailCredentials
+    public struct EmailCredentials
     {
         public string ServerName;
         public int Port;
@@ -63,7 +63,7 @@ namespace FaqBotServer
         }
     }
 
-    class Settings
+    public class Settings
     {
         public static Settings GetSettings()
         {

@@ -9,7 +9,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FaqBotServer
+namespace SettingsAndDB
 {
 	using System.Data.Linq;
 	using System.Data.Linq.Mapping;
@@ -34,6 +34,12 @@ namespace FaqBotServer
     partial void UpdateQuestion(Question instance);
     partial void DeleteQuestion(Question instance);
     #endregion
+		
+		public DataBaseDataContext() : 
+				base(global::SettingsAndDB.Properties.Settings.Default.QuestionsConnectionString1, mappingSource)
+		{
+			OnCreated();
+		}
 		
 		public DataBaseDataContext(string connection) : 
 				base(connection, mappingSource)
