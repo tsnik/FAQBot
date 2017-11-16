@@ -60,7 +60,7 @@ namespace FaqBotServer
             }
             catch (ApiRequestException)
             {
-
+                //Что-то было не так с колбеком, игнорируем
             }
             return result;
         }
