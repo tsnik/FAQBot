@@ -23,6 +23,11 @@ namespace FaqBotServer
         private static TelegramBotClient bot;
         private static Dictionary<long, Client> clientList = new Dictionary<long, Client>();
 
+        /// <summary>
+        /// Получить клиента или создать нового
+        /// </summary>
+        /// <param name="cid">ID чата</param>
+        /// <returns></returns>
         private static Client getClient(long cid)
         {
             Client client;
