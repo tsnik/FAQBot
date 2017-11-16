@@ -107,15 +107,27 @@ namespace SettingsAndDB
             return GenAnswerFromQuestion(dataBase.Questions.Where(x => x.Id == id).First());
         }
 
-        public Table<Question> GetTable()
-        {
-            return dataBase.Questions;
-        }
-
         public void Update()
         {
             dataBase.SubmitChanges();
             dataBase.Refresh(RefreshMode.OverwriteCurrentValues, dataBase.Questions);
+        }
+
+        public void Insert(Question q)
+        {
+            dataBase.Questions.InsertOnSubmit(q);
+            Update();
+        }
+
+        public void Delete(Question q)
+        {
+            dataBase.Questions.DeleteOnSubmit(q);
+            Update();
+        }
+
+        public IQueryable<Question> GetChilds(int id = -1)
+        {
+            return dataBase.Questions.Where(x => x.parent == id);
         }
 
         #region Private

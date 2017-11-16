@@ -27,18 +27,35 @@ namespace FAQConfigurator
             cbType.SelectedIndex = index;
         }
 
+        public QuestionEditForm()
+        {
+            InitializeComponent();
+            question = new Question();
+        }
+
+        public Question Question
+        {
+            get
+            {
+                return question;
+            }
+        }
+
         private Question question;
 
         private void btnOk_Click(object sender, EventArgs e)
         {
             question.title = Utils.ParseString(tbTitle);
             question.text = Utils.ParseString(tbText);
-            QuestionsBase.getQuestionBase().Update();
+            question.answer = cbType.SelectedIndex == 1;
+            question.other = cbType.SelectedIndex == 2;
+            this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
     }
