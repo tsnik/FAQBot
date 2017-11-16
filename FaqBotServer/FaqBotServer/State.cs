@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -54,7 +55,13 @@ namespace FaqBotServer
             {
                 result = await onCallbackQuery(callbackQuery, bot);
             }
-            await bot.AnswerCallbackQueryAsync(callbackQuery.Id);
+            try {
+                await bot.AnswerCallbackQueryAsync(callbackQuery.Id);
+            }
+            catch (ApiRequestException)
+            {
+
+            }
             return result;
         }
 
@@ -69,7 +76,7 @@ namespace FaqBotServer
             {
                 return mid;
             }
-        } 
+        }
 
 
         protected long cid;

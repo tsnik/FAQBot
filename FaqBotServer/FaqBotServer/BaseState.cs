@@ -41,6 +41,7 @@ namespace FaqBotServer
         protected override async Task<StateResult> onCallbackQuery(CallbackQuery callbackQuery, TelegramBotClient bot)
         {
             int id = int.Parse(callbackQuery.Data);
+            Answer ans;
             if (id < 0)
             {
                 if ((Button)id == Button.Back)
@@ -48,16 +49,19 @@ namespace FaqBotServer
                     if (history.Count > 0) history.Pop();
                     id = history.Count == 0 ? -1 : history.Peek();
                 }
-            }
-            Answer ans;
-            if (currentList != null && id != -1)
-            {
-                ans = currentList.Find(x => x.id == id);
-                history.Push(id);
+                ans = QuestionsBase.getQuestionBase().GetElement(id);
             }
             else
             {
-                ans = QuestionsBase.getQuestionBase().GetElement(id);
+                history.Push(id);
+                if (currentList != null && id != -1)
+                {
+                    ans = currentList.Find(x => x.id == id);
+                }
+                else
+                {
+                    ans = QuestionsBase.getQuestionBase().GetElement(id);
+                }
             }
             return await openButton(ans, callbackQuery.Message.MessageId, bot);
         }
