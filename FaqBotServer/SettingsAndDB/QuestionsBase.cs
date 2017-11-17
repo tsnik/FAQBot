@@ -59,12 +59,17 @@ namespace SettingsAndDB
     {
         public static QuestionsBase getQuestionBase()
         {
-            if (questionBase == null)
+            if (questionBase == null || !questionBase.loaded)
             {
                 questionBase = new QuestionsBase(Settings.GetSettings().DBCreds);
                 questionBase.LoadDB();
             }
             return questionBase;
+        }
+
+        public static void UnLoad()
+        {
+            questionBase = null;
         }
 
         /// <summary>
@@ -124,6 +129,7 @@ namespace SettingsAndDB
         private static QuestionsBase questionBase;
         private DBCredentials creds;
         private DataBaseDataContext dataBase;
+        private bool loaded;
 
         private QuestionsBase(DBCredentials creds)
         {
@@ -142,7 +148,10 @@ namespace SettingsAndDB
                 builder.Password = creds.Password;
             }
             builder.InitialCatalog = creds.DBName;
+            builder.ConnectTimeout = 1;
             dataBase = new DataBaseDataContext(builder.ConnectionString);
+            dataBase.Questions.Count();
+            loaded = true;
         }
 
         private Answer GenAnswerFromQuestion(Question q)

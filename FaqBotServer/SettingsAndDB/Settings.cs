@@ -112,6 +112,17 @@ namespace SettingsAndDB
             return settings;
         }
 
+        public static Settings GetOrCreateSettings()
+        {
+            if (settings == null)
+            {
+                settings = new Settings();
+                settings.dbCreds = new DBCredentials();
+                settings.emailCreds = new EmailCredentials();
+            }
+            return settings;
+        }
+
         public string ApiKey
         {
             get
@@ -172,6 +183,14 @@ namespace SettingsAndDB
             }
         }
 
+        public bool IsLoaded
+        {
+            get
+            {
+                return loaded;
+            }
+        }
+
         #region Private
         private string apiKey;
         private string supportEmail;
@@ -179,6 +198,7 @@ namespace SettingsAndDB
         private DBCredentials dbCreds;
         private EmailCredentials emailCreds;
         private static Settings settings;
+        private bool loaded;
 
         private Settings()
         {
@@ -199,6 +219,7 @@ namespace SettingsAndDB
             fromEmail = f.ReadLine();
             emailCreds = new EmailCredentials(f.ReadLine());
             f.Close();
+            loaded = true;
             return;
         }
         public void SaveSettings(string filename = DEF_FILENAME)

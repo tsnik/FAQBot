@@ -9,13 +9,26 @@ namespace FAQConfigurator
 {
     class Utils
     {
-        public static string ParseString(TextBox tb, bool required = false)
+        public static string ParseString(TextBox tb, bool required = false, bool returnNull = true)
         {
-            return tb.Text == "" ? null : tb.Text;
+            if(required && tb.Text == "")
+            {
+                throw new ArgumentNullException();
+            }
+            return tb.Text == "" ? (returnNull ? null : tb.Text) : tb.Text;
         }
         public static int ParseInt(TextBox tb, bool required = false)
         {
-            return int.Parse(tb.Text);
+            try
+            {
+                return int.Parse(tb.Text);
+            }
+            catch (FormatException e)
+            {
+                if (required)
+                    throw e;
+                return -1;
+            }
         }
     }
 }

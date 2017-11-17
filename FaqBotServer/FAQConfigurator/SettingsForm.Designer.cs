@@ -57,6 +57,7 @@
             this.btnSaveSettings = new System.Windows.Forms.Button();
             this.dlgSaveSettings = new System.Windows.Forms.SaveFileDialog();
             this.btnEditDatabase = new System.Windows.Forms.Button();
+            this.btnCheckConnection = new System.Windows.Forms.Button();
             this.gbDB.SuspendLayout();
             this.gbEmail.SuspendLayout();
             this.SuspendLayout();
@@ -308,6 +309,7 @@
             // 
             // btnEditDatabase
             // 
+            this.btnEditDatabase.Enabled = false;
             this.btnEditDatabase.Location = new System.Drawing.Point(22, 304);
             this.btnEditDatabase.Name = "btnEditDatabase";
             this.btnEditDatabase.Size = new System.Drawing.Size(178, 23);
@@ -316,11 +318,22 @@
             this.btnEditDatabase.UseVisualStyleBackColor = true;
             this.btnEditDatabase.Click += new System.EventHandler(this.btnEditDatabase_Click);
             // 
+            // btnCheckConnection
+            // 
+            this.btnCheckConnection.Location = new System.Drawing.Point(22, 244);
+            this.btnCheckConnection.Name = "btnCheckConnection";
+            this.btnCheckConnection.Size = new System.Drawing.Size(149, 23);
+            this.btnCheckConnection.TabIndex = 7;
+            this.btnCheckConnection.Text = "Проверить соединение";
+            this.btnCheckConnection.UseVisualStyleBackColor = true;
+            this.btnCheckConnection.Click += new System.EventHandler(this.btnCheckConnection_Click);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(477, 359);
+            this.Controls.Add(this.btnCheckConnection);
             this.Controls.Add(this.btnEditDatabase);
             this.Controls.Add(this.btnSaveSettings);
             this.Controls.Add(this.label1);
@@ -328,6 +341,8 @@
             this.Controls.Add(this.gbEmail);
             this.Controls.Add(this.gbDB);
             this.Controls.Add(this.btnLoadSettings);
+            this.MaximumSize = new System.Drawing.Size(493, 397);
+            this.MinimumSize = new System.Drawing.Size(493, 397);
             this.Name = "SettingsForm";
             this.Text = "Form1";
             this.gbDB.ResumeLayout(false);
@@ -370,6 +385,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.SaveFileDialog dlgSaveSettings;
         private System.Windows.Forms.Button btnEditDatabase;
+        private System.Windows.Forms.Button btnCheckConnection;
     }
 }
 
