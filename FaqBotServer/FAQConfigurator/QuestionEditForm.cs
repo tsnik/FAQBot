@@ -31,6 +31,7 @@ namespace FAQConfigurator
         {
             InitializeComponent();
             question = new Question();
+            cbType.SelectedIndex = 0;
         }
 
         public Question Question
