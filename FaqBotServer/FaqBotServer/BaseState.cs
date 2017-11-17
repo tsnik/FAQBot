@@ -75,7 +75,7 @@ namespace FaqBotServer
         #region Private
         private Stack<int> history;
         private List<Answer> currentList;
-        private delegate Task<MessageToSend> MessageGenerator(int id=-1);
+        private delegate Task<MessageToSend> MessageGenerator(string text, int id=-1);
         private MessageGenerator genMessage;
 
         private InlineKeyboardMarkup genKeyBoard(List<Answer> answer = null, bool oneline = false)
@@ -120,19 +120,20 @@ namespace FaqBotServer
                 return new StateResult(ChatState.OTHER, data: new object[2] { ans.Text, history });
             }
             String text = ans.Text;
-            currentList = null;
             int id = ans.id;
+            currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
             IReplyMarkup kb_markup;
+            MessageToSend m;
             if (ans.Type == AnswerType.Category)
             {
-                MessageToSend m = await genMessage(id);
-                text = m.Text;
-                kb_markup = m.KeyboardMarkup;
+                m = await genMessageText(MAIN_SELECT, id);
             }
             else
             {
-                kb_markup = genKeyBoard(currentList);
+                m = await genMessageButtons(ans.Text, id);
             }
+            text = m.Text;
+            kb_markup = m.KeyboardMarkup;
 
             await bot.EditMessageTextAsync(cid, mid, text, replyMarkup: kb_markup);
             return new StateResult();
@@ -140,23 +141,21 @@ namespace FaqBotServer
 
         private async Task showMessage(TelegramBotClient bot, int id = -1)
         {
-            MessageToSend m = await genMessage(id);
+            currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
+            MessageToSend m = await genMessage(MAIN_SELECT, id);
             await sendMessage(bot, m.Text, m.KeyboardMarkup);
         }
 
-        private async Task<MessageToSend> genMessageButtons(int id = -1)
+        private async Task<MessageToSend> genMessageButtons(string text, int id = -1)
         {
-            currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
-            string text = MAIN_SELECT;
             InlineKeyboardMarkup kb_markup = genKeyBoard(currentList);
             return new MessageToSend(text, kb_markup);
         }
 
-        private async Task<MessageToSend> genMessageText(int id = -1)
+        private async Task<MessageToSend> genMessageText(string text, int id = -1)
         {
-            currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
             List<Answer> tmp = new List<Answer>(currentList);
-            string text = MAIN_SELECT + "\n";
+            text += "\n";
             for (int i = 0; i < tmp.Count; i++)
             {
                 text += (i + 1).ToString() + ". " + tmp[i].Title + "\n";
