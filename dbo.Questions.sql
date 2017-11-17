@@ -1,7 +1,7 @@
 USE [Questions]
 GO
 
-/****** Object: Table [dbo].[Questions] Script Date: 14.11.2017 11:24:23 ******/
+/****** Object: Table [dbo].[Questions] Script Date: 17.11.2017 23:06:08 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -10,8 +10,8 @@ GO
 
 CREATE TABLE [dbo].[Questions] (
     [Id]     INT  IDENTITY (1, 1) NOT NULL,
-    [title]  TEXT NULL,
-    [text]   TEXT NULL,
+    [title]  TEXT COLLATE Cyrillic_General_CI_AS NULL,
+    [text]   TEXT COLLATE Cyrillic_General_CI_AS NULL,
     [pos]    INT  NOT NULL,
     [answer] BIT  NOT NULL,
     [other]  BIT  NOT NULL,
