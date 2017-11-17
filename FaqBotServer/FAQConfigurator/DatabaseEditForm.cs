@@ -24,31 +24,7 @@ namespace FAQConfigurator
 
         }
 
-        private void loadTreeView()
-        {
-            QuestionsBase db = QuestionsBase.getQuestionBase();
-            TreeNode baseNode = new TreeNode("Справочник");
-            Question baseCat = new Question();
-            baseCat.Id = -1;
-            baseNode.Tag = baseCat;
-            baseNode.Nodes.AddRange(getChilds());
-            tvQuestions.Nodes.Add(baseNode);
-        }
-
-        private TreeNode fromQuestionToTreeNode(Question q)
-        {
-            TreeNode tn = new TreeNode(q.title == null ? Answer.TITLE_DEF : q.title,
-                getChilds(q.Id));
-            tn.Tag = q;
-            return tn;
-        }
-
-        private TreeNode[] getChilds(int id = -1)
-        {
-            QuestionsBase db = QuestionsBase.getQuestionBase();
-            return db.GetChilds(id).Select<Question, TreeNode>(fromQuestionToTreeNode).ToArray();
-        }
-
+        #region Event handlers
         private void tvQuestions_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (((Question)e.Node.Tag).Id != -1)
@@ -91,6 +67,52 @@ namespace FAQConfigurator
             }
         }
 
+        private void btnDown_Click(object sender, EventArgs e)
+        {
+            TreeNode node = tvQuestions.SelectedNode;
+            swapNodes(node, node.NextNode);
+        }
+
+        private void tvQuestions_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (((Question)e.Node.Tag).Id == -1)
+            {
+                btnUp.Enabled = false;
+                btnDown.Enabled = false;
+                btnRemove.Enabled = false;
+                btnLeft.Enabled = false;
+                btnRight.Enabled = false;
+                return;
+            }
+            btnRemove.Enabled = true;
+            btnUp.Enabled = btnRight.Enabled = e.Node.Index != 0;
+            btnLeft.Enabled = ((Question)e.Node.Parent.Tag).Id != -1;
+            btnDown.Enabled = e.Node.Index != e.Node.Parent.Nodes.Count - 1;
+        }
+
+        private void btnRight_Click(object sender, EventArgs e)
+        {
+            TreeNode node = tvQuestions.SelectedNode;
+            TreeNode parent = node.PrevNode;
+            moveNode(node, parent);
+        }
+
+        private void btnLeft_Click(object sender, EventArgs e)
+        {
+            TreeNode node = tvQuestions.SelectedNode;
+            TreeNode parent = node.Parent.Parent;
+            moveNode(node, parent, node.Parent.Index + 1);
+        }
+
+        private void btnUp_Click(object sender, EventArgs e)
+        {
+            TreeNode node = tvQuestions.SelectedNode;
+            swapNodes(node.PrevNode, node, true);
+        }
+        #endregion
+
+        #region Functions
+
         private void RemoveNode(TreeNode node)
         {
             Question question = (Question)node.Tag;
@@ -103,14 +125,6 @@ namespace FAQConfigurator
             }
             if (((Question)node.Tag).Id != -1)
                 node.Remove();
-        }
-
-        private void btnUp_Click(object sender, EventArgs e)
-        {
-            TreeNode node = tvQuestions.SelectedNode;
-            swapNodes(node.PrevNode, node, true);
-            
-            
         }
 
         private void swapNodes(TreeNode first, TreeNode second, bool secondSelected = false)
@@ -131,27 +145,54 @@ namespace FAQConfigurator
             QuestionsBase.getQuestionBase().Update();
         }
 
-        private void btnDown_Click(object sender, EventArgs e)
+        private void moveNode(TreeNode node, TreeNode newParent, int index = -1)
         {
-            TreeNode node = tvQuestions.SelectedNode;
-            swapNodes(node, node.NextNode);
+            if (index == -1)
+                index = newParent.Nodes.Count;
+
+            TreeNode oldParent = node.Parent;
+            node.Remove();
+            newParent.Nodes.Insert(index, node);
+            newParent.Expand();
+            tvQuestions.SelectedNode = node;
+            tvQuestions.Focus();
+            ((Question)node.Tag).parent = ((Question)node.Parent.Tag).Id;
+            updatePositions(newParent);
+            updatePositions(oldParent);
         }
 
-        private void tvQuestions_AfterSelect(object sender, TreeViewEventArgs e)
+        private void updatePositions(TreeNode parent)
         {
-            if(((Question)e.Node.Tag).Id == -1)
+            foreach(TreeNode node in parent.Nodes)
             {
-                btnUp.Enabled = false;
-                btnDown.Enabled = false;
-                btnRemove.Enabled = false;
-                btnLeft.Enabled = false;
-                btnRight.Enabled = false;
-                return;
+                ((Question)node.Tag).pos = node.Index;
             }
-            btnRemove.Enabled = true;
-            btnUp.Enabled = btnRight.Enabled = e.Node.Index != 0;
-            btnLeft.Enabled = ((Question)e.Node.Parent.Tag).Id != -1;
-            btnDown.Enabled = e.Node.Index != e.Node.Parent.Nodes.Count - 1;
         }
+
+        private void loadTreeView()
+        {
+            QuestionsBase db = QuestionsBase.getQuestionBase();
+            TreeNode baseNode = new TreeNode("Справочник");
+            Question baseCat = new Question();
+            baseCat.Id = -1;
+            baseNode.Tag = baseCat;
+            baseNode.Nodes.AddRange(getChilds());
+            tvQuestions.Nodes.Add(baseNode);
+        }
+
+        private TreeNode fromQuestionToTreeNode(Question q)
+        {
+            TreeNode tn = new TreeNode(q.title == null ? Answer.TITLE_DEF : q.title,
+                getChilds(q.Id));
+            tn.Tag = q;
+            return tn;
+        }
+
+        private TreeNode[] getChilds(int id = -1)
+        {
+            QuestionsBase db = QuestionsBase.getQuestionBase();
+            return db.GetChilds(id).Select<Question, TreeNode>(fromQuestionToTreeNode).ToArray();
+        }
+        #endregion
     }
 }
