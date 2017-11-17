@@ -71,22 +71,12 @@ namespace SettingsAndDB
         /// Вернёт список, если есть несколько ккатегорий на этом уровне
         /// Вернет список из одного элемента, если достигли самого нижнего уровня
         /// </summary>
-        /// <param name="pos">Позиция элемента в списке. Для верхнего уровня -1.</param>
         /// <param name="id">Идентификатор родителя. Для верхнего уровня -1.</param>
         /// <returns></returns>
         public List<Answer> GetAnswer(int id = -1)
         {
-            Question curr;
-            if (id == -1 || !(curr = dataBase.Questions.First<Question>(x => x.Id == id)).answer)
-            {
-                List<Answer> l = new List<Answer>(dataBase.Questions.Where(x => x.parent == id)
-                    .OrderBy(x => x.pos)
-                    .Select<Question, Answer>(GenAnswerFromQuestion));
-                return l;
-            }
-            List<Answer> answer = new List<Answer>();
-            answer.Add(new Answer(AnswerType.Answer, curr.Id, curr.text));
-            return answer;
+            return new List<Answer>(GetChilds(id)
+                .Select<Question, Answer>(GenAnswerFromQuestion));
         }
 
         public List<Answer> GetElements(List<int> ids)
@@ -127,7 +117,7 @@ namespace SettingsAndDB
 
         public IQueryable<Question> GetChilds(int id = -1)
         {
-            return dataBase.Questions.Where(x => x.parent == id);
+            return dataBase.Questions.Where(x => x.parent == id).OrderBy(x => x.pos);
         }
 
         #region Private

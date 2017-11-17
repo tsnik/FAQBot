@@ -31,12 +31,15 @@
             this.tvQuestions = new System.Windows.Forms.TreeView();
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
+            this.btnLeft = new System.Windows.Forms.Button();
+            this.btnRight = new System.Windows.Forms.Button();
             this.btnUp = new System.Windows.Forms.Button();
             this.btnDown = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // tvQuestions
             // 
+            this.tvQuestions.AllowDrop = true;
             this.tvQuestions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tvQuestions.BackColor = System.Drawing.SystemColors.Window;
@@ -44,12 +47,13 @@
             this.tvQuestions.Name = "tvQuestions";
             this.tvQuestions.Size = new System.Drawing.Size(300, 346);
             this.tvQuestions.TabIndex = 1;
+            this.tvQuestions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvQuestions_AfterSelect);
             this.tvQuestions.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvQuestions_NodeMouseDoubleClick);
             // 
             // btnAdd
             // 
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAdd.Location = new System.Drawing.Point(306, 120);
+            this.btnAdd.Location = new System.Drawing.Point(306, 93);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(30, 23);
             this.btnAdd.TabIndex = 2;
@@ -60,7 +64,7 @@
             // btnRemove
             // 
             this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRemove.Location = new System.Drawing.Point(306, 149);
+            this.btnRemove.Location = new System.Drawing.Point(306, 122);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(30, 23);
             this.btnRemove.TabIndex = 3;
@@ -68,25 +72,45 @@
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
+            // btnLeft
+            // 
+            this.btnLeft.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLeft.Location = new System.Drawing.Point(306, 151);
+            this.btnLeft.Name = "btnLeft";
+            this.btnLeft.Size = new System.Drawing.Size(30, 23);
+            this.btnLeft.TabIndex = 4;
+            this.btnLeft.Text = "<<";
+            this.btnLeft.UseVisualStyleBackColor = true;
+            // 
+            // btnRight
+            // 
+            this.btnRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRight.Location = new System.Drawing.Point(306, 180);
+            this.btnRight.Name = "btnRight";
+            this.btnRight.Size = new System.Drawing.Size(30, 23);
+            this.btnRight.TabIndex = 5;
+            this.btnRight.Text = ">>";
+            this.btnRight.UseVisualStyleBackColor = true;
+            // 
             // btnUp
             // 
-            this.btnUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUp.Location = new System.Drawing.Point(306, 178);
+            this.btnUp.Location = new System.Drawing.Point(306, 210);
             this.btnUp.Name = "btnUp";
             this.btnUp.Size = new System.Drawing.Size(30, 23);
-            this.btnUp.TabIndex = 4;
-            this.btnUp.Text = "<<";
+            this.btnUp.TabIndex = 6;
+            this.btnUp.Text = "/\\";
             this.btnUp.UseVisualStyleBackColor = true;
+            this.btnUp.Click += new System.EventHandler(this.btnUp_Click);
             // 
             // btnDown
             // 
-            this.btnDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDown.Location = new System.Drawing.Point(306, 207);
+            this.btnDown.Location = new System.Drawing.Point(306, 240);
             this.btnDown.Name = "btnDown";
             this.btnDown.Size = new System.Drawing.Size(30, 23);
-            this.btnDown.TabIndex = 5;
-            this.btnDown.Text = ">>";
+            this.btnDown.TabIndex = 7;
+            this.btnDown.Text = "\\/";
             this.btnDown.UseVisualStyleBackColor = true;
+            this.btnDown.Click += new System.EventHandler(this.btnDown_Click);
             // 
             // DatabaseEditForm
             // 
@@ -95,6 +119,8 @@
             this.ClientSize = new System.Drawing.Size(344, 346);
             this.Controls.Add(this.btnDown);
             this.Controls.Add(this.btnUp);
+            this.Controls.Add(this.btnRight);
+            this.Controls.Add(this.btnLeft);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.tvQuestions);
@@ -109,6 +135,8 @@
         private System.Windows.Forms.TreeView tvQuestions;
         private System.Windows.Forms.Button btnAdd;
         private System.Windows.Forms.Button btnRemove;
+        private System.Windows.Forms.Button btnLeft;
+        private System.Windows.Forms.Button btnRight;
         private System.Windows.Forms.Button btnUp;
         private System.Windows.Forms.Button btnDown;
     }

@@ -13,16 +13,15 @@ namespace FAQConfigurator
 {
     public partial class DatabaseEditForm : Form
     {
+        public const string DELETE_APPROVE = "Вы уверены, что хотите удалить этот элемент и все элементы, вложенные в него?";
+        public const string DELETE_APPROVE_TITLE = "Удаление элемента";
+
+
         public DatabaseEditForm()
         {
             InitializeComponent();
             loadTreeView();
 
-        }
-
-        private void dgvQuestions_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            QuestionsBase.getQuestionBase().Update();
         }
 
         private void loadTreeView()
@@ -52,11 +51,14 @@ namespace FAQConfigurator
 
         private void tvQuestions_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            QuestionEditForm f = new QuestionEditForm((Question)e.Node.Tag);
-            DialogResult result = f.ShowDialog();
-            if (result == DialogResult.OK)
+            if (((Question)e.Node.Tag).Id != -1)
             {
-                QuestionsBase.getQuestionBase().Update();
+                QuestionEditForm f = new QuestionEditForm((Question)e.Node.Tag);
+                DialogResult result = f.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    QuestionsBase.getQuestionBase().Update();
+                }
             }
         }
 
@@ -81,10 +83,75 @@ namespace FAQConfigurator
 
         private void btnRemove_Click(object sender, EventArgs e)
         {
-            TreeNode node = tvQuestions.SelectedNode;
+            DialogResult result = MessageBox.Show(DELETE_APPROVE,
+                DELETE_APPROVE_TITLE, MessageBoxButtons.OKCancel);
+            if (result == DialogResult.OK)
+            {
+                RemoveNode(tvQuestions.SelectedNode);
+            }
+        }
+
+        private void RemoveNode(TreeNode node)
+        {
             Question question = (Question)node.Tag;
             QuestionsBase.getQuestionBase().Delete(question);
-            node.Parent.Nodes.Remove(node);
+            TreeNode[] nodes = new TreeNode[node.Nodes.Count];
+            node.Nodes.CopyTo(nodes, 0);
+            foreach (TreeNode child in nodes)
+            {
+                RemoveNode(child);
+            }
+            if (((Question)node.Tag).Id != -1)
+                node.Remove();
+        }
+
+        private void btnUp_Click(object sender, EventArgs e)
+        {
+            TreeNode node = tvQuestions.SelectedNode;
+            swapNodes(node.PrevNode, node, true);
+            
+            
+        }
+
+        private void swapNodes(TreeNode first, TreeNode second, bool secondSelected = false)
+        {
+            TreeNode parent = first.Parent;
+            int firstIndex = first.Index;
+            int secondIndex = second.Index;
+            Question firstQuestion = (Question)first.Tag;
+            Question secondQuestion = (Question)second.Tag;
+            first.Remove();
+            second.Remove();
+            parent.Nodes.Insert(firstIndex, second);
+            parent.Nodes.Insert(secondIndex, first);
+            second.TreeView.SelectedNode = secondSelected ? second : first;
+            second.TreeView.Focus();
+            firstQuestion.pos = secondIndex;
+            secondQuestion.pos = firstIndex;
+            QuestionsBase.getQuestionBase().Update();
+        }
+
+        private void btnDown_Click(object sender, EventArgs e)
+        {
+            TreeNode node = tvQuestions.SelectedNode;
+            swapNodes(node, node.NextNode);
+        }
+
+        private void tvQuestions_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if(((Question)e.Node.Tag).Id == -1)
+            {
+                btnUp.Enabled = false;
+                btnDown.Enabled = false;
+                btnRemove.Enabled = false;
+                btnLeft.Enabled = false;
+                btnRight.Enabled = false;
+                return;
+            }
+            btnRemove.Enabled = true;
+            btnUp.Enabled = btnRight.Enabled = e.Node.Index != 0;
+            btnLeft.Enabled = ((Question)e.Node.Parent.Tag).Id != -1;
+            btnDown.Enabled = e.Node.Index != e.Node.Parent.Nodes.Count - 1;
         }
     }
 }
