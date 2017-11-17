@@ -14,6 +14,14 @@ namespace FAQConfigurator
 {
     public partial class SettingsForm : Form
     {
+        public const string ERROR_TITLE = "Ошибка";
+        public const string SUCCESS_TITLE = "Успех";
+        public const string ERROR_ENTER_DB = "Пожалуйста заполните имя сервера и базу данных";
+        public const string ERRORR_CONNECTION_FAILED = "Не удалось установить соединение с сервером";
+        public const string CONNECTION_SUCCESS = "Соединение успешно установлено";
+        public const string ERROR_ENTER_PORT = "Пожалуйста укажите номер порта";
+        public const string ERROR_ENTER_REQUIRED_FIELDS = "Пожалуйста заполните все обязательные поля";
+
         public SettingsForm()
         {
             InitializeComponent();
@@ -65,14 +73,14 @@ namespace FAQConfigurator
             }
             catch (ArgumentNullException)
             {
-                MessageBox.Show("Пожалуйста заполните все обязательные поля",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ERROR_ENTER_REQUIRED_FIELDS,
+                    ERROR_TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             catch (FormatException)
             {
-                MessageBox.Show("Пожалуйста укажите номер порта",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ERROR_ENTER_PORT,
+                    ERROR_TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             return true;
@@ -100,8 +108,8 @@ namespace FAQConfigurator
         {
             if(tbServerName.Text == "" || tbDatabaseName.Text == "")
             {
-                MessageBox.Show("Пожалуйста заполните имя сервера и базу данных",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ERROR_ENTER_DB,
+                    ERROR_TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             if (!retrieveSettings())
@@ -110,12 +118,12 @@ namespace FAQConfigurator
                 QuestionsBase.getQuestionBase();
             } catch (SqlException)
             {
-                MessageBox.Show("Не удалось установить соединение с сервером",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ERRORR_CONNECTION_FAILED,
+                    ERROR_TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            MessageBox.Show("Соединение успешно установлено",
-                    "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(CONNECTION_SUCCESS,
+                    SUCCESS_TITLE, MessageBoxButtons.OK, MessageBoxIcon.Information);
             btnEditDatabase.Enabled = true;
         }
     }
