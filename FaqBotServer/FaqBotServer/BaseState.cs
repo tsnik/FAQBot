@@ -34,7 +34,7 @@ namespace FaqBotServer
 
         public override async Task<StateResult> OnMessage(Message message, TelegramBotClient bot)
         {
-            await showMessage(bot);
+            await showCategory(bot);
             return new StateResult();
         }
 
@@ -47,14 +47,19 @@ namespace FaqBotServer
                 if ((Button)id == Button.Back)
                 {
                     if (history.Count > 0) history.Pop();
-                    id = history.Count == 0 ? -1 : history.Peek();
+                    id = history.Count == 0 ? QuestionsBase.ROOT_ID : history.Peek();
+                }
+                else if ((Button)id == Button.Main)
+                {
+                    history = new Stack<int>();
+                    id = QuestionsBase.ROOT_ID;
                 }
                 ans = QuestionsBase.getQuestionBase().GetElement(id);
             }
             else
             {
                 history.Push(id);
-                if (currentList != null && id != -1)
+                if (currentList != null && id != QuestionsBase.ROOT_ID)
                 {
                     ans = currentList.Find(x => x.id == id);
                 }
@@ -69,23 +74,41 @@ namespace FaqBotServer
         public override async Task Resume(TelegramBotClient bot)
         {
             history.Pop();
-            await showMessage(bot, history.Peek());
+            await showCategory(bot, history.Peek());
         }
 
         #region Private
         private Stack<int> history;
         private List<Answer> currentList;
-        private delegate Task<MessageToSend> MessageGenerator(string text, int id=-1);
+        private delegate MessageToSend MessageGenerator(string text, int id = QuestionsBase.ROOT_ID);
         private MessageGenerator genMessage;
+
+        private List<InlineKeyboardButton[]> genSpecialButtons()
+        {
+            List<InlineKeyboardButton[]> result = new List<InlineKeyboardButton[]>();
+            if (history.Count > 0)
+            {
+                result.Add(
+                    new InlineKeyboardButton[1]{ new InlineKeyboardCallbackButton(BACK,
+                    ((int)Button.Back).ToString()) });
+            }
+            if (history.Count > 1)
+            {
+                result.Add(
+                    new InlineKeyboardButton[1]{new InlineKeyboardCallbackButton(MAIN,
+                    ((int)Button.Main).ToString()) });
+            }
+            return result;
+        }
 
         private InlineKeyboardMarkup genKeyBoard(List<Answer> answer = null, bool oneline = false)
         {
             InlineKeyboardMarkup kb_markup = new InlineKeyboardMarkup();
             int num = answer == null ? 0 : answer.Count;
             int linecount = oneline ? 1 : num;
-            //Если есть история, то создаем место под кнопку назад
+            List<InlineKeyboardButton[]> specialButtons = genSpecialButtons();
             InlineKeyboardButton[][] inlineKeyboard =
-                new InlineKeyboardButton[linecount+ (history.Count > 0 ? 1 : 0)][];
+                new InlineKeyboardButton[linecount + specialButtons.Count][];
 
             if (oneline)
             {
@@ -96,7 +119,7 @@ namespace FaqBotServer
             {
                 string text = answer[i].Title;
                 string id = answer[i].id.ToString();
-                if(oneline)
+                if (oneline)
                 {
                     inlineKeyboard[0][i] = new InlineKeyboardCallbackButton(text, id);
                     continue;
@@ -105,54 +128,50 @@ namespace FaqBotServer
                     new InlineKeyboardCallbackButton(text, id)
                 };
             }
-            if (history.Count > 0)
-            {
-                inlineKeyboard[linecount] = new InlineKeyboardButton[1]{
-                    new InlineKeyboardCallbackButton(BACK, ((int)Button.Back).ToString())};
-            }
+
+            if (specialButtons.Count > 0)
+                specialButtons.CopyTo(inlineKeyboard, linecount);
+
             kb_markup.InlineKeyboard = inlineKeyboard;
             return kb_markup;
         }
+
         private async Task<StateResult> openButton(Answer ans, int mid, TelegramBotClient bot)
         {
             if (ans.Type == AnswerType.Other)
             {
-                return new StateResult(ChatState.OTHER, data: new object[2] { ans.Text, history });
+                return new StateResult(ChatState.OTHER, data: 
+                    new object[2] { ans.Text, history });
             }
-            String text = ans.Text;
             int id = ans.id;
-            currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
-            IReplyMarkup kb_markup;
+            currentList = QuestionsBase.getQuestionBase().GetCategoryChilds(id);
             MessageToSend m;
             if (ans.Type == AnswerType.Category)
             {
-                m = await genMessageText(MAIN_SELECT, id);
+                m = genMessageText(MAIN_SELECT, id);
             }
             else
             {
-                m = await genMessageButtons(ans.Text, id);
+                m = genMessageInlineText(ans.Text, id);
             }
-            text = m.Text;
-            kb_markup = m.KeyboardMarkup;
-
-            await bot.EditMessageTextAsync(cid, mid, text, replyMarkup: kb_markup);
+            await bot.EditMessageTextAsync(cid, mid, m.Text, replyMarkup: m.KeyboardMarkup);
             return new StateResult();
         }
 
-        private async Task showMessage(TelegramBotClient bot, int id = -1)
+        private async Task showCategory(TelegramBotClient bot, int id = QuestionsBase.ROOT_ID)
         {
-            currentList = QuestionsBase.getQuestionBase().GetAnswer(id);
-            MessageToSend m = await genMessage(MAIN_SELECT, id);
+            currentList = QuestionsBase.getQuestionBase().GetCategoryChilds(id);
+            MessageToSend m = genMessage(MAIN_SELECT, id);
             await sendMessage(bot, m.Text, m.KeyboardMarkup);
         }
 
-        private async Task<MessageToSend> genMessageButtons(string text, int id = -1)
+        private MessageToSend genMessageInlineText(string text, int id = QuestionsBase.ROOT_ID)
         {
             InlineKeyboardMarkup kb_markup = genKeyBoard(currentList);
             return new MessageToSend(text, kb_markup);
         }
 
-        private async Task<MessageToSend> genMessageText(string text, int id = -1)
+        private MessageToSend genMessageText(string text, int id = QuestionsBase.ROOT_ID)
         {
             List<Answer> tmp = new List<Answer>(currentList);
             text += "\n";

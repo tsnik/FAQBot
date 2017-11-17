@@ -35,11 +35,12 @@ namespace FaqBotServer
         public const string OTHER_SUBJECT = "Чат-бот DeltaPro";
         public const string OTHER_SUCCESS = "Письмо успешно отправлено.";
         public const string OTHER_CATEGORY = "Категория: ";
+        public const string OTHER_WRONG_EMAIL = "Неверный формат email. Попробуйте ещё раз:";
 
         public OtherState(long cid, long mid, object[] data) : base(cid, mid)
         {
             this.text = (string)data[0];
-            if(data[1] != null)
+            if (data[1] != null)
             {
                 this.history = (Stack<int>)data[1];
             }
@@ -160,6 +161,8 @@ namespace FaqBotServer
                 case MessageType.PhotoMessage:
                     int num = message.Photo.Length;
                     otherPhoto = message.Photo[num - 1].FileId;
+                    if (message.Caption != null)
+                        otherText = message.Caption;
                     break;
                 case MessageType.TextMessage:
                     otherText = message.Text;
@@ -178,10 +181,28 @@ namespace FaqBotServer
                     await sendMessage(bot, OTHER_ENTER_EMAIL);
                     break;
                 case OtherStateName.Email:
+                    if (!checkEmailFormat(message.Text))
+                    {
+                        await sendMessage(bot, OTHER_WRONG_EMAIL);
+                        return;
+                    }
                     email = message.Text;
                     state = OtherStateName.Review;
                     await sendReview(bot);
                     break;
+            }
+        }
+
+        private bool checkEmailFormat(string email)
+        {
+            try
+            {
+                MailAddress addr = new MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -211,7 +232,7 @@ namespace FaqBotServer
             m.BodyEncoding = Encoding.UTF8;
             EmailCredentials creds = Settings.GetSettings().EmailCreds;
             SmtpClient smtp = new SmtpClient(creds.ServerName, creds.Port);
-            if(creds.User != null) smtp.Credentials = new NetworkCredential(creds.User, creds.Password);
+            if (creds.User != null) smtp.Credentials = new NetworkCredential(creds.User, creds.Password);
             smtp.EnableSsl = true;
             await smtp.SendMailAsync(m);
             await sendMessage(bot, OTHER_SUCCESS, genReturnMainKeyBoard());

@@ -27,7 +27,7 @@ namespace FAQConfigurator
         #region Event handlers
         private void tvQuestions_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            if (((Question)e.Node.Tag).Id != -1)
+            if (((Question)e.Node.Tag).Id != QuestionsBase.ROOT_ID)
             {
                 QuestionEditForm f = new QuestionEditForm((Question)e.Node.Tag);
                 DialogResult result = f.ShowDialog();
@@ -75,7 +75,7 @@ namespace FAQConfigurator
 
         private void tvQuestions_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (((Question)e.Node.Tag).Id == -1)
+            if (((Question)e.Node.Tag).Id == QuestionsBase.ROOT_ID)
             {
                 btnUp.Enabled = false;
                 btnDown.Enabled = false;
@@ -86,7 +86,7 @@ namespace FAQConfigurator
             }
             btnRemove.Enabled = true;
             btnUp.Enabled = btnRight.Enabled = e.Node.Index != 0;
-            btnLeft.Enabled = ((Question)e.Node.Parent.Tag).Id != -1;
+            btnLeft.Enabled = ((Question)e.Node.Parent.Tag).Id != QuestionsBase.ROOT_ID;
             btnDown.Enabled = e.Node.Index != e.Node.Parent.Nodes.Count - 1;
         }
 
@@ -123,7 +123,7 @@ namespace FAQConfigurator
             {
                 RemoveNode(child);
             }
-            if (((Question)node.Tag).Id != -1)
+            if (((Question)node.Tag).Id != QuestionsBase.ROOT_ID)
                 node.Remove();
         }
 
@@ -145,9 +145,9 @@ namespace FAQConfigurator
             QuestionsBase.getQuestionBase().Update();
         }
 
-        private void moveNode(TreeNode node, TreeNode newParent, int index = -1)
+        private void moveNode(TreeNode node, TreeNode newParent, int index = QuestionsBase.ROOT_ID)
         {
-            if (index == -1)
+            if (index == QuestionsBase.ROOT_ID)
                 index = newParent.Nodes.Count;
 
             TreeNode oldParent = node.Parent;
@@ -174,7 +174,7 @@ namespace FAQConfigurator
             QuestionsBase db = QuestionsBase.getQuestionBase();
             TreeNode baseNode = new TreeNode("Справочник");
             Question baseCat = new Question();
-            baseCat.Id = -1;
+            baseCat.Id = QuestionsBase.ROOT_ID;
             baseNode.Tag = baseCat;
             baseNode.Nodes.AddRange(getChilds());
             tvQuestions.Nodes.Add(baseNode);
@@ -188,7 +188,7 @@ namespace FAQConfigurator
             return tn;
         }
 
-        private TreeNode[] getChilds(int id = -1)
+        private TreeNode[] getChilds(int id = QuestionsBase.ROOT_ID)
         {
             QuestionsBase db = QuestionsBase.getQuestionBase();
             return db.GetChilds(id).Select<Question, TreeNode>(fromQuestionToTreeNode).ToArray();

@@ -21,7 +21,6 @@ namespace SettingsAndDB
         public const string TEXT_DEF = "Пришлите скриншот и опишите проблему, с которой Вы столкнулись, на адрес deltapro@deltacredit.ru или в этот чат";
 
 
-
         public AnswerType Type;
         public string Text
         {
@@ -57,6 +56,8 @@ namespace SettingsAndDB
 
     public class QuestionsBase
     {
+        public const int ROOT_ID = -1;
+
         public static QuestionsBase getQuestionBase()
         {
             if (questionBase == null || !questionBase.loaded)
@@ -78,7 +79,7 @@ namespace SettingsAndDB
         /// </summary>
         /// <param name="id">Идентификатор родителя. Для верхнего уровня -1.</param>
         /// <returns></returns>
-        public List<Answer> GetAnswer(int id = -1)
+        public List<Answer> GetCategoryChilds(int id = ROOT_ID)
         {
             return new List<Answer>(GetChilds(id)
                 .Select<Question, Answer>(GenAnswerFromQuestion));
@@ -97,7 +98,7 @@ namespace SettingsAndDB
         {
             if (id < 0)
             {
-                return new Answer(AnswerType.Category, -1);
+                return new Answer(AnswerType.Category, ROOT_ID);
             }
             return GenAnswerFromQuestion(dataBase.Questions.Where(x => x.Id == id).First());
         }
@@ -120,7 +121,7 @@ namespace SettingsAndDB
             Update();
         }
 
-        public IQueryable<Question> GetChilds(int id = -1)
+        public IQueryable<Question> GetChilds(int id = ROOT_ID)
         {
             return dataBase.Questions.Where(x => x.parent == id).OrderBy(x => x.pos);
         }
