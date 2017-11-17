@@ -131,7 +131,7 @@
             this.Controls.Add(this.tvQuestions);
             this.MinimumSize = new System.Drawing.Size(360, 384);
             this.Name = "DatabaseEditForm";
-            this.Text = "DatabaseEditForm";
+            this.Text = "Редактор базы данных";
             this.ResumeLayout(false);
 
         }

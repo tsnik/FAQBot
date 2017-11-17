@@ -59,7 +59,9 @@
             // 
             // tbText
             // 
-            this.tbText.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tbText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tbText.Location = new System.Drawing.Point(0, 94);
             this.tbText.Multiline = true;
             this.tbText.Name = "tbText";
@@ -126,8 +128,9 @@
             this.Controls.Add(this.tbText);
             this.Controls.Add(this.cbType);
             this.Controls.Add(this.tbTitle);
+            this.MinimumSize = new System.Drawing.Size(517, 422);
             this.Name = "QuestionEditForm";
-            this.Text = "QuestionEditForm";
+            this.Text = "Редактор элемента";
             this.ResumeLayout(false);
             this.PerformLayout();
 

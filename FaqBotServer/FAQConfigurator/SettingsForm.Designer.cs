@@ -344,7 +344,7 @@
             this.MaximumSize = new System.Drawing.Size(493, 397);
             this.MinimumSize = new System.Drawing.Size(493, 397);
             this.Name = "SettingsForm";
-            this.Text = "Form1";
+            this.Text = "Редактор настроек";
             this.gbDB.ResumeLayout(false);
             this.gbDB.PerformLayout();
             this.gbEmail.ResumeLayout(false);
