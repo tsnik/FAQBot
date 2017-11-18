@@ -47,14 +47,26 @@ namespace FaqBotServer
         {
             var message = messageEventArgs.Message;
             Client client = getClient(message.Chat.Id);
-            await client.OnMessage(message);
+            try {
+                await client.OnMessage(message);
+            }
+            catch (Exception)
+            {
+                await client.Reload();
+            }
         }
 
         private static async void BotOnCallbackQuery(object sender, CallbackQueryEventArgs callbackQueryEventArgs)
         {
             CallbackQuery callbackQuery = callbackQueryEventArgs.CallbackQuery;
             Client client = getClient(callbackQuery.Message.Chat.Id);
-            await client.OnCallbackQuery(callbackQuery);
+            try {
+                await client.OnCallbackQuery(callbackQuery);
+            }
+            catch (Exception)
+            {
+                await client.Reload();
+            }
         }
     }
 }

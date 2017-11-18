@@ -14,11 +14,20 @@ namespace FaqBotServer
 
     class Client
     {
+        public const string ERROR = "Что-то пошло не так...";
+
         public Client(long cid, TelegramBotClient bot)
         {
             this.cid = cid;
             this.bot = bot;
             this.history = new Stack<State>();
+        }
+
+        public async Task Reload()
+        {
+            this.history = new Stack<State>();
+            await bot.SendTextMessageAsync(cid, ERROR);
+            await OnMessage(new Message());
         }
 
         public async Task OnMessage(Message message)
